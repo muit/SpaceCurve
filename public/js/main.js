@@ -1,0 +1,3 @@
+$(function(){
+    game = new Game();
+});
