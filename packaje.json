@@ -1,0 +1,23 @@
+{
+    "name": "spacecurve",
+    "version": "0.0.1",
+    "description": "A game similar than curvefever but in 3d.",
+    "contributors": ["Miguel Fernandez <miguel_3c@hotmail.com>"],
+    "license": "GPL",
+    "main": "bin/server.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/muit/SpaceCurve"
+    },
+    "dependencies": {
+        "socket.io": "*"
+    },
+    "keywords" : ["battle", "3D", "game", "curvefever"],
+    "engines": {
+        "node": "*"
+    },
+    "bin": {
+        "spacecurve": "bin/server.js"
+    },
+    "private": false
+}
