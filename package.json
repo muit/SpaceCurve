@@ -25,7 +25,7 @@
     "gulp-uglify" : "*",
     "gulp-util"   : "*",
     "gulp-yml"    : "*"
-  }
+  },
   "bin": {
       "spacecurve": "bin/server.js"
   },
