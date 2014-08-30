@@ -4,7 +4,7 @@
 function Game(){
     this.done = false;
     this.scene = new THREE.Scene();
-    var camera = new THREE.PerspectiveCamera(45, window.innerWidth, window.innerHeight, 0.1, 1000);
+    this.camera = new THREE.PerspectiveCamera(45, window.innerWidth, window.innerHeight, 0.1, 1000);
     this.renderer = new THREE.WebGLRenderer();
 
     this.renderer.setClearColor(0x555555);
@@ -29,7 +29,7 @@ Game.prototype.render = function(){
     this.update();
 
     this.renderer.render(this.scene, this.camera); 
-    if(!done)
+    if(!this.done)
         requestAnimationFrame(this.render);
 }
 
