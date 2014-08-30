@@ -7,10 +7,10 @@ function Game(){
     var camera = new THREE.PerspectiveCamera(45, window.innerWidth, window.innerHeight, 0.1, 1000);
     this.renderer = new THREE.WebGLRenderer();
 
-    renderer.setClearColor(0x555555);
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.setClearColor(0x555555);
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
 
-    $("#canvas").append(renderer.domElement);
+    $("#canvas").append(this.renderer.domElement);
 
     this.render();
 };
