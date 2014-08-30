@@ -15,15 +15,8 @@ function Game(){
     this.render();
 };
 
-Game.prototype.update = function(){
-    //Read input and make the logic
-    Game.prototype.objects.forEach(function(element, index, array) {
-        element.update();
-    });
-    Game.prototype.entities.forEach(function(element, index, array) {
-        element.update();
-    });
-}
+Game.prototype.objects = [];
+Game.prototype.entities = [];
 
 Game.prototype.render = function(){
     this.update();
@@ -33,8 +26,15 @@ Game.prototype.render = function(){
         requestAnimationFrame(this.render);
 }
 
-Game.prototype.objects = [];
-Game.prototype.entities = [];
+Game.prototype.update = function(){
+    //Read input and make the logic
+    Game.prototype.objects.forEach(function(element, index, array) {
+        element.update();
+    });
+    Game.prototype.entities.forEach(function(element, index, array) {
+        element.update();
+    });
+}
 
 //*************************************************************************
 // Object Class
