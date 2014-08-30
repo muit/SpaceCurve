@@ -1,6 +1,6 @@
-Util = require("../src/util.js");
-http = require("../src/http_server.js");
-ws = require("../src/ws_server.js");
+Util = require("../source/core/util.js");
+http = require("../source/core/http_server.js");
+ws = require("../source/core/ws_server.js");
 
 //*******************************
 // HTTP SERVER

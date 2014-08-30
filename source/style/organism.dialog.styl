@@ -1,0 +1,127 @@
+[data-system=dialog]
+  &:not(.active)
+    display: none
+  &.active
+    &:not(.no-block)
+      background-color: rgba(0,0,0,0.75)
+    &.no-block
+      transition height (.5 * ANIMATION_DURATION)
+
+    > [data-organism-dialog]
+      vendor(animation-duration, ANIMATION_DURATION)
+      vendor(animation-timing-function, ANIMATION_EASE)
+      &.show
+        vendor(animation-direction, normal)
+      &.hide
+        vendor(animation-direction, reverse)
+        vendor(animation-fill-mode, forwards)
+
+      &:not(.side)
+        &.show
+          vendor(animation-name, dialog-show)
+        &.hide
+          vendor(animation-name, dialog-show)
+
+      &.side
+        &:not(.right)
+          &.show
+            vendor(animation-name, dialog-show-side-left)
+          &.hide
+            vendor(animation-name, dialog-show-side-left)
+        &.right
+          &.show
+            vendor(animation-name, dialog-show-side-right)
+          &.hide
+            vendor(animation-name, dialog-show-side-right)
+
+    > [data-organism-dialog=loading]
+      SPEED = ANIMATION_DURATION * 1.4
+      &::before
+        animation dialog-loading SPEED 0 infinite
+      &::after
+        animation dialog-loading SPEED (SPEED / 2) infinite
+
+  > :not([data-organism-dialog=loading]):not([data-organism-dialog=push])
+    background-color: lighten(BACKGROUND, 2.5%)
+
+    &, [data-atom-button], [data-atom-link]
+      color: darken(BACKGROUND, 75%)
+
+    &.accept
+      > [data-organism-header]
+        background-color: ACCEPT
+    &.cancel
+      > [data-organism-header]
+        background-color: CANCEL
+    &.warning
+      > [data-organism-header]
+        background-color: WARNING
+
+    &.accept, &.cancel, &.warning
+      > [data-organism-header]
+        &, [data-atom-button], [data-atom-link]
+          color: WHITE
+
+    > [data-organism-footer]
+      background-color: darken(BACKGROUND, 2.5%)
+      border-top: solid 1px darken(BACKGROUND, 5%)
+
+  > [data-organism-dialog=loading]
+    background: darken(DARK, 50%)
+    border-radius: 1rem
+    &::before, &::after
+      background-color: WHITE
+      border-radius: 50%
+
+  > [data-organism-dialog=push]
+    background-color: THEME
+    color: WHITE
+    > h1
+      box-shadow 0 (-(SHADOW_HEIGHT)) 0 SHADOW_OPACITY
+    > section
+      background-color: WHITE
+      > figure
+        background-color: #ddd
+      > p
+        color: DARK
+
+@keyframes dialog-show
+  0%
+    transform: translateY(500%)
+  60%
+    transform: translateY(-7%)
+  80%
+    transform: translateY(2%)
+  100%
+    transform: translateY(0)
+
+@keyframes dialog-show-side-left
+  0%
+    transform: translateX(-500%)
+  60%
+    transform: translateX(7%)
+  80%
+    transform: translateX(-2%)
+  100%
+    transform: translateX(0)
+
+@keyframes dialog-show-side-right
+  0%
+    transform: translateX(500%)
+  60%
+    transform: translateX(-7%)
+  80%
+    transform: translateX(2%)
+  100%
+    transform: translateX(0)
+
+@keyframes dialog-loading
+  0%
+    opacity: 1
+    transform scale(1)
+  50%
+    opacity: 0.5
+    transform scale(0.85)
+  100%
+    opacity: 1
+    transform scale(1)

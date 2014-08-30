@@ -1,0 +1,1 @@
+{"children":[{"Organism.Header":{"children":[{"Atom.Heading":{"size":"h1","id":"user_name","value":"Name"}},{"Molecule.Navigation":{"children":[{"Atom.Button":{"events":["touch"],"icon":"loading-config","path":"options"}}],"style":"right"}}]}},{"Organism.Section":{"children":[{"Molecule.Div":{"children":[],"id":"canvas"}}],"id":"main_content"}}],"id":"main"}
