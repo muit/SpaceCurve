@@ -3,15 +3,17 @@ children:
       children:
         - Atom.Heading:
             size: h1
-            value: Space Curve
-  - Organism.Section:
-      children:
+            value: User Name
+            id: user_name
         - Molecule.Navigation:
             children:
               - Atom.Button:
                   events:
                     - touch
-                  path: game/canvas
-                  text: "Play!"
-      id: menu
-id: main
+                  icon: back
+                  path: back
+            style: right
+  - Organism.Section:
+      children: []
+      id: canvas
+id: game
