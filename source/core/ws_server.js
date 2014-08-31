@@ -70,6 +70,7 @@ WsServer.prototype.update = function(){
         player.update();
     }
 
+    this.sendInfo();
     //Here needs a FPS controller
 
     this.update();
