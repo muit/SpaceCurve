@@ -43,3 +43,11 @@ Object.prototype.remove = function(o){
     var i = this.indexOf(o);
     return (i >= 0)? this.splice(i, 1)[0] : undefined;
 }
+
+//*******************************
+// Trigger Class
+//*******************************
+Trigger = function(){}
+Trigger.prototype.get = function(){
+    return (!this.s)?this.s = true:false;
+}
