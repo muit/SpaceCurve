@@ -85,7 +85,12 @@ EventMap.prototype.events = [];
 EventMap.prototype.callbacks = [];
 
 EventMap.prototype.createEvent = function(callback, delay){
-    var guid = setTimeout(callback, delay);
+    var self = this;
+    var guid = setTimeout(function(){
+        self.removeEvent(guid);
+        callback();
+    }, delay);
+
     this.events.push(guid);
     this.callbacks.push(callback);
     return this.events.length-1;
@@ -95,8 +100,12 @@ EventMap.prototype.restartEvent = function(event, delay){
     var index = this.events.indexOf(event);
     if (index >= 0){
         clearTimeout(this.events[index]);
-        var newGuid = setTimeout(this.callbacks[index], delay);
-        this.events[index] = newGuid;
+        var self = this;
+        
+        this.events[index] = setTimeout(function(){
+            self.removeEvent(guid);
+            self.callbacks[index]();
+        }, delay);
     }
 }
 
