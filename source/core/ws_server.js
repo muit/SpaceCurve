@@ -32,19 +32,26 @@ WsServer.prototype.players = [];
 WsServer.prototype.newPlayer = function(socket)
 {
     socket.on("login", function(name, password){
-        var player = new Player(name, socket, 0, 0, 0);
-        this.players.push(player);
+        if(this.players.getByName(name) == undefined)
 
-        //Create Events for all packets
-        for(var opcode in WsServer.packets)
+            var player = new Player(name, socket, 0, 0, 0);
+            this.players.push(player);
+
+            //Create Events for all packets
+            for(var opcode in WsServer.packets)
+            {
+                //Get function name from opcode
+                var callback = WsServer.prototype[WsServer.packets[opcode]];
+                
+                //Create Event
+                socket.on(opcode, function(data){
+                    callback(player, data);
+                });
+            }
+        }
+        else
         {
-            //Get function name from opcode
-            var callback = WsServer.prototype[WsServer.packets[opcode]];
-            
-            //Create Event
-            socket.on(opcode, function(data){
-                callback(player, data);
-            });
+            socket.emit("serverMessage", "That user already exists. Choose another name!");
         }
     });
 }
@@ -105,6 +112,10 @@ WsServer.Player.prototype.setPosition = function(x, y){
 WsServer.Player.prototype.update = function(){
     //Update position with direction
 }
+
+
+WsServer.Player.prototype.speed = Config.Player.speed;
+WsServer.Player.prototype.radius = Config.Player.radius;
 
 
 
