@@ -43,6 +43,9 @@ Array.prototype.remove = function(o){
     var i = this.indexOf(o);
     return (i >= 0)? this.splice(i, 1)[0] : undefined;
 }
+Array.prototype.removeByIndex = function(i){
+    return (i >= 0)? this.splice(i, 1)[0] : undefined;
+}
 
 //*******************************
 // Player Array Helpers
@@ -72,3 +75,42 @@ Vector2.distance = function(v1, v2){
     return Math.sqrt(Math.pow(v1.x + v2.x, 2) + Math.pow(v1.y + v2.y, 2)); 
 }
 Vector2.dot = function(v1, v2){ return v1.x * v2.x + v1.y * v2.y; }
+
+
+//*******************************
+// EventMap Class
+//*******************************
+EventMap = function(){}
+EventMap.prototype.events = [];
+EventMap.prototype.callbacks = [];
+
+EventMap.prototype.createEvent = function(callback, delay){
+    var guid = setTimeout(callback, delay);
+    this.events.push(guid);
+    this.callbacks.push(callback);
+    return this.events.length-1;
+}
+
+EventMap.prototype.restartEvent = function(event, delay){
+    var index = this.events.indexOf(event);
+    if (index >= 0){
+        clearTimeout(this.events[index]);
+        var newGuid = setTimeout(this.callbacks[index], delay);
+        this.events[index] = newGuid;
+    }
+}
+
+EventMap.prototype.removeEvent = function(event){
+    var index = this.events.indexOf(event);
+    if (index >= 0) clearTimeout(this.events[index]);
+    this.events.removeByIndex(index);
+    this.callbacks.removeByIndex(index);
+}
+
+EventMap.prototype.removeAllEvents = function(){
+    this.events.forEach(function(guid, index, array) {
+        clearTimeout(guid);
+    });
+    this.events = [];
+    this.callbacks = [];
+}
