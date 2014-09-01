@@ -59,3 +59,16 @@ Trigger = function(){}
 Trigger.prototype.get = function(){
     return (!this.s)?this.s = true:false;
 }
+
+//*******************************
+// Vector2 Class
+//*******************************
+Vector2 = function(x, y){this.x = x; this.y = y;}
+Vector2.prototype.x = null;
+Vector2.prototype.y = null;
+Vector2.prototype.distance = function(v2){ return Vector2.distance(this, v2); };
+
+Vector2.distance = function(v1, v2){ 
+    return Math.sqrt(Math.pow(v1.x + v2.x, 2) + Math.pow(v1.y + v2.y, 2)); 
+}
+Vector2.dot = function(v1, v2){ return v1.x * v2.x + v1.y * v2.y; }
