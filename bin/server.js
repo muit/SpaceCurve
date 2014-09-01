@@ -1,3 +1,4 @@
+Config = require("../source/core/config.js");
 Util = require("../source/core/util.js");
 http = require("../source/core/http_server.js");
 ws = require("../source/core/ws_server.js");

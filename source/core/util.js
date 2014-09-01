@@ -37,12 +37,20 @@ Object.prototype.key = function(o){
 //*******************************
 // Array Helpers
 //*******************************
-Object.prototype.first = function(){ return this[0]; }
-Object.prototype.last = function(){ return this[this.length-1]; }
-Object.prototype.remove = function(o){ 
+Array.prototype.first = function(){ return this[0]; }
+Array.prototype.last = function(){ return this[this.length-1]; }
+Array.prototype.remove = function(o){ 
     var i = this.indexOf(o);
     return (i >= 0)? this.splice(i, 1)[0] : undefined;
 }
+
+//*******************************
+// Player Array Helpers
+//*******************************
+Array.prototype.getByName = function(n){ 
+    return this.filter(function(p){ return p.name == n; }).first;
+}
+
 
 //*******************************
 // Trigger Class
