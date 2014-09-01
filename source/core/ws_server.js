@@ -85,9 +85,7 @@ WsServer.prototype.update = function(){
 
 WsServer.prototype.sendInfo = function(){
     io.emit('info', this.players.map(function(player){
-        info = player.position;
-        info.name = player.name;
-        return info;
+        return {name: player.name, x: player.position.x, y: player.position.y};
     }));
 }
 
@@ -101,25 +99,24 @@ WsServer.Player = function(name, socket, x, y, rad){
 
     this.name = name;
     this.socket = socket;
-    this.position = {x: x, y: y};
+    this.position = new Vector2(x, y);
     this.direction = rad;
 }
 
 WsServer.Player.prototype.setPosition = function(x, y){
-    this.position = {x: x, y: y};
+    this.position = new Vector2(x, y);
 }
 
 WsServer.Player.prototype.update = function(){
-    //Update position with direction
+    var alpha = this.direction;
+    this.position.x += this.speed * Math.cos(alpha);
+    this.position.y += this.speed * Math.sin(alpha);
 }
 
 
 WsServer.Player.prototype.speed = Config.Player.speed;
 WsServer.Player.prototype.radius = Config.Player.radius;
 
-
-
-
-
-
-
+//*******************************
+// Object class
+//*******************************
