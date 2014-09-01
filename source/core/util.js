@@ -62,6 +62,9 @@ Trigger = function(){}
 Trigger.prototype.get = function(){
     return (!this.s)?this.s = true:false;
 }
+Trigger.prototype.reset = function(){
+    this.s = undefined;
+}
 
 //*******************************
 // Vector2 Class
@@ -101,7 +104,7 @@ EventMap.prototype.restartEvent = function(event, delay){
     if (index >= 0){
         clearTimeout(this.events[index]);
         var self = this;
-        
+
         this.events[index] = setTimeout(function(){
             self.removeEvent(guid);
             self.callbacks[index]();

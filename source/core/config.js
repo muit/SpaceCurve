@@ -16,11 +16,16 @@ exports.Config = {
         initialPos: "random", // Random/Corners
     },
 
+    Object: {
+        duration: 3500,
+        respawnSpeed: 8000,
+    },
+
     //--------
     //System
     //--------
     Server: {
-        multiCore: false,
         cluster: false,
+        clusterSize: 4, // number/"auto"
     }
 }
