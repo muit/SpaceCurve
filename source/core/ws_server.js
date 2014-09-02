@@ -142,11 +142,15 @@ WsServer.Object.prototype._activate = function(before, after){
 //************************
 //Object Types
 //************************
-WsServer.Object.Speed = function(){}
-WsServer.Object.Speed.prototype = new WsServer.Object();
-WsServer.Object.Speed.prototype.constructor = WsServer.Object.Speed;
 
-WsServer.Object.Speed.prototype.activate = function(player){
+//----------
+// Bird
+//----------
+WsServer.Object.Bird = function(){}
+WsServer.Object.Bird.prototype = new WsServer.Object();
+WsServer.Object.Bird.prototype.constructor = WsServer.Object.Bird;
+
+WsServer.Object.Bird.prototype.activate = function(player){
     function before(){
         //When Object is Catched:
         player.speed *= 2;
@@ -154,6 +158,72 @@ WsServer.Object.Speed.prototype.activate = function(player){
     function after(){
         //When Object has Finished:
         player.speed /= 2;
+    };
+
+    this._activate(before, after);
+}
+
+//----------
+// Turtle
+//----------
+WsServer.Object.Turtle = function(){}
+WsServer.Object.Turtle.prototype = new WsServer.Object();
+WsServer.Object.Turtle.prototype.constructor = WsServer.Object.Turtle;
+
+WsServer.Object.Turtle.prototype.activate = function(player){
+    function before(){
+        player.speed /= 2;
+    };
+    function after(){
+        player.speed *= 2;
+    };
+
+    this._activate(before, after);
+}
+
+//----------
+// CrossWall
+//----------
+WsServer.Object.CrossWall = function(){}
+WsServer.Object.CrossWall.prototype = new WsServer.Object();
+WsServer.Object.CrossWall.prototype.constructor = WsServer.Object.CrossWall;
+
+WsServer.Object.CrossWall.prototype.activate = function(player){
+    function before(){
+    };
+    function after(){
+    };
+
+    this._activate(before, after);
+}
+
+//----------
+// CrossLine
+//----------
+WsServer.Object.CrossLine = function(){}
+WsServer.Object.CrossLine.prototype = new WsServer.Object();
+WsServer.Object.CrossLine.prototype.constructor = WsServer.Object.CrossLine;
+
+WsServer.Object.CrossLine.prototype.activate = function(player){
+    function before(){
+    };
+    function after(){
+    };
+
+    this._activate(before, after);
+}
+
+//----------
+// Immunity
+//----------
+WsServer.Object.Immunity = function(){}
+WsServer.Object.Immunity.prototype = new WsServer.Object();
+WsServer.Object.Immunity.prototype.constructor = WsServer.Object.Immunity;
+
+WsServer.Object.Immunity.prototype.activate = function(player){
+    function before(){
+    };
+    function after(){
     };
 
     this._activate(before, after);
