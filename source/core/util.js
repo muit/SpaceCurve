@@ -126,3 +126,42 @@ EventMap.prototype.removeAllEvents = function(){
     this.events = [];
     this.callbacks = [];
 }
+
+//*******************************
+// Reference Class
+//*******************************
+_ = function(variable){
+    if(variable instanceof Reference)
+        return variable.value;
+    return new Reference(variable);
+}
+
+Reference = function(variable){
+    this._ = this.value = variable;
+}
+
+
+//*******************************
+// Is not defined method
+//
+// Comprovates if a class(or a subclass) is undefined and defines it.
+//*******************************
+ifNotDefined = function(classPath){
+    if(!classPath || classPath.length<=0) return undefined;
+
+    classPath = classPath.split(".");
+
+    var parent = window;
+    for(var i=0, len=classPath.length; i<len; i++){
+        if(parent[classPath[i]] == undefined)
+            parent[classPath[i]] = function(){};
+        parent = parent[classPath[i]];
+    }
+    return parent;
+}
+
+
+
+
+
+

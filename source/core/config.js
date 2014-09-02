@@ -1,3 +1,10 @@
+//Prepare Objects
+ifNotDefined("WsServer.Object.Bird");
+ifNotDefined("WsServer.Object.Turtle");
+ifNotDefined("WsServer.Object.CrossWall");
+ifNotDefined("WsServer.Object.CrossLine");
+ifNotDefined("WsServer.Object.Immunity");
+
 exports.Config = {
     //--------
     //Game
@@ -6,8 +13,6 @@ exports.Config = {
     Map: {
         height: 400,
         width: 400,
-        objects: true,
-        objectTypes: ["bird", "crosswall", "turtle", "immunity"],
     },
 
     Player: {
@@ -17,8 +22,16 @@ exports.Config = {
     },
 
     Object: {
+        enabled: true,
         duration: 3500,
         respawnSpeed: 8000,
+        enabledTypes: [
+            WsServer.Object.Bird,
+            WsServer.Object.Turtle,
+            WsServer.Object.CrossWall,
+            WsServer.Object.CrossLine,
+            WsServer.Object.Immunity
+        ],
     },
 
     //--------
