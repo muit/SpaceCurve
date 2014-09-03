@@ -8,33 +8,43 @@
 var urlParser = require('url');
 var fs = require('fs');
 
-exports.start = function(port)
+exports.start = function(port, options)
 {
-    return new HttpServer(port);
+    return new HttpServer(port, options);
 }
 
 //*******************************
 // Http Server Class
 //*******************************
 
-var HttpServer = function(port, secure){
+var HttpServer = function(port, options){
     var self = this;
 
+    if (options == undefined)
+        options = {
+            secure: false,
+            debug: false,
+        }
     
-    if(typeof secure == "undefined" || !secure){
+    if(options.debug == undefined)
+        this.debug = false;
+    else
+        this.debug = options.debug;
+    
+    if (options.secure == undefined || !secure){
+        var http = require('http');
+        var server = http.createServer(function(request, response){
+            self.serve(self, request, response);
+        });
+    }
+    else
+    {
         var options = {
             key: fs.readFileSync("keys/key.pem"),
             cert: fs.readFileSync("keys/cert.pem")
         };
         var https = require('https');
         var server = https.createServer(options, function(request, response){
-            self.serve(self, request, response);
-        });
-    }
-    else
-    {
-        var http = require('http');
-        var server = http.createServer(function(request, response){
             self.serve(self, request, response);
         });
     }
@@ -45,6 +55,8 @@ var HttpServer = function(port, secure){
         console.log('Http server running at port: ' + port);
     });
 }
+
+HttpServer.prototype.files = {};
 
 //*******************************
 // Serve files or code
@@ -84,28 +96,39 @@ HttpServer.prototype.serveHome = function(self, request, response){
 //*******************************
 // Serve js or css
 HttpServer.prototype.serveFile = function(status, file, response){
-    fs.readFile('public/' + file, function(err, data) {
-        if (err)
-        {
-            response.writeHead(404, {
-                'Content-Type': 'text/plain'
+    var self = this, 
+        path = 'public/' + file;
+
+    if(this.debug || this.files[path] == undefined){
+        fs.readFile('public/' + file, function(err, data) {
+            if (err)
+            {
+                response.writeHead(404, {
+                    'Content-Type': 'text/plain'
+                });
+                response.end('Page not found');
+                return;
+            }
+
+            var type = 'text/html';
+
+            if (file.endsWith('.js'))
+                type = 'text/javascript';
+
+            if (file.endsWith('.css'))
+                type = 'text/css';
+
+            response.writeHead(status, {
+                'Content-Length': data.length,
+                'Content-Type': type
             });
-            response.end('Page not found');
-            return;
-        }
 
-        var type = 'text/html';
+            response.end(data);
 
-        if (file.endsWith('.js'))
-            type = 'text/javascript';
-
-        if (file.endsWith('.css'))
-            type = 'text/css';
-
-        response.writeHead(status, {
-            'Content-Length': data.length,
-            'Content-Type': type
+            if(!self.debug) self.files[path] = response;
         });
-        response.end(data);
-    });
+    }
+    else{
+        response = this.files[path];
+    }
 }
