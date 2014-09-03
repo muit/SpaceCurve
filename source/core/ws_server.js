@@ -17,6 +17,9 @@ var WsServer = function(port)
     console.log('WebSocket server running at port: ' + port);
     this.io.total = 0;
     this.io.on('connection', this.newPlayer);
+
+    console.log("Started Server Bucle.");
+    this.update();
 }
 
 //*******************************
@@ -34,6 +37,7 @@ WsServer.prototype.newPlayer = function(socket)
 {
     socket.on("login", function(name, password){
         if(this.players.getByName(name) == undefined){
+            socket.emit("login", true, "Logged in succesfully");
 
             var player = new Player(name, socket, 0, 0, 0);
             this.players.push(player);
@@ -52,7 +56,7 @@ WsServer.prototype.newPlayer = function(socket)
         }
         else
         {
-            socket.emit("serverMessage", "That user already exists. Choose another name!");
+            socket.emit("login", true, "Could not login with that credentials.");
         }
     });
 }
