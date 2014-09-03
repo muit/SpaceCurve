@@ -5,7 +5,7 @@
 // Only server the html & files
 //*******************************
 
-var https = require('https');
+var https = ;
 var urlParser = require('url');
 var fs = require('fs');
 
@@ -18,17 +18,29 @@ exports.start = function(port)
 // Http Server Class
 //*******************************
 
-var HttpServer = function(port){
+var HttpServer = function(port, secure){
     var self = this;
 
-    var options = {
-        key: fs.readFileSync("keys/key.pem"),
-        cert: fs.readFileSync("keys/cert.pem")
-    };
+    
+    if(typeof secure == "undefined" || !secure){
+        var options = {
+            key: fs.readFileSync("keys/key.pem"),
+            cert: fs.readFileSync("keys/cert.pem")
+        };
+        var https = require('https');
+        var server = https.createServer(options, function(request, response){
+            self.serve(self, request, response);
+        });
+    }
+    else
+    {
+        var http = require('http');
+        var server = http.createServer(function(request, response){
+            self.serve(self, request, response);
+        });
+    }
 
-    var server = https.createServer(options, function(request, response){
-       self.serve(self, request, response);
-    });
+    
 
     server.listen(port, function() {
         console.log('Http server running at port: ' + port);
