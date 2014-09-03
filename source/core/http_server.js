@@ -5,7 +5,7 @@
 // Only server the html & files
 //*******************************
 
-var http = require('http');
+var https = require('https');
 var urlParser = require('url');
 var fs = require('fs');
 
@@ -20,7 +20,13 @@ exports.start = function(port)
 
 var HttpServer = function(port){
     var self = this;
-    var server = http.createServer(function(request, response){
+
+    var options = {
+        key: fs.readFileSync("keys/key.pem"),
+        cert: fs.readFileSync("keys/cert.pem")
+    };
+
+    var server = https.createServer(options, function(request, response){
        self.serve(self, request, response);
     });
 
