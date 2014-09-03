@@ -173,7 +173,7 @@ Timer = function(oninstance, fps){
         oninstance();
 
         var diff = (new Date().getTime() - start) - (count++ * speed);
-        window.setTimeout(instance, (speed - diff));
+        setTimeout(instance, (speed - diff));
     }
-    window.setTimeout(instance, speed);
+    setTimeout(instance, speed);
 }

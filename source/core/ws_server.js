@@ -70,7 +70,7 @@ WsServer.prototype.setDirection = function(player, direction){
 
 WsServer.prototype.disconect = function(player, data){
     this.players.remove(player);
-    io.emit('players', this.players);
+    this.io.emit('players', this.players);
 }
 
 //*******************************
@@ -78,19 +78,22 @@ WsServer.prototype.disconect = function(player, data){
 // Should be initialiced on a thread
 //*******************************
 WsServer.prototype.update = function(){
+    var self = this;
     new Timer(function(){
-        this.players.forEach(function(player, index, array) {
+        self.players.forEach(function(player, index, array) {
             player.update();
         });
 
-        this.sendInfo();
+        self.sendInfo();
     }, 40);//40fps
 }
 
 WsServer.prototype.sendInfo = function(){
-    io.emit('info', this.players.map(function(player){
-        return {name: player.name, x: player.position.x, y: player.position.y};
-    }));
+    var playerData = {};
+    this.players.forEach(function(player, index){
+         playerData[index] = {name: player.name, x: player.position.x, y: player.position.y};
+    });
+    this.io.emit("info", playerData);
 }
 
 //*******************************
