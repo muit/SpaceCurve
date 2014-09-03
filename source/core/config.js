@@ -6,6 +6,11 @@ ifNotDefined("WsServer.Object.CrossLine");
 ifNotDefined("WsServer.Object.Immunity");
 
 Config = {
+    Info: {
+        version: "0.0.1",
+        stable: false,
+        repository: "https://github.com/muit/SpaceCurve"
+    },
     //--------
     //Game
     //--------
