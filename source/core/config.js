@@ -5,7 +5,7 @@ ifNotDefined("WsServer.Object.CrossWall");
 ifNotDefined("WsServer.Object.CrossLine");
 ifNotDefined("WsServer.Object.Immunity");
 
-exports.Config = {
+Config = {
     //--------
     //Game
     //--------

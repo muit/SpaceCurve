@@ -1,5 +1,5 @@
 Util = require("../source/core/util.js");
-Config = require("../source/core/config.js");
+require("../source/core/config.js");
 http = require("../source/core/http_server.js");
 ws = require("../source/core/ws_server.js");
 
