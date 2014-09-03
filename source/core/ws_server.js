@@ -145,7 +145,9 @@ WsServer.Object.prototype._activate = function(before, after){
 //----------
 // Bird
 //----------
-WsServer.Object.Bird = function(){}
+WsServer.Object.Bird = function(x, y){
+    this.position = new Vector2(x,y);
+}
 WsServer.Object.Bird.prototype = new WsServer.Object();
 WsServer.Object.Bird.prototype.constructor = WsServer.Object.Bird;
 
@@ -165,7 +167,9 @@ WsServer.Object.Bird.prototype.activate = function(player){
 //----------
 // Turtle
 //----------
-WsServer.Object.Turtle = function(){}
+WsServer.Object.Turtle = function(x, y){
+    this.position = new Vector2(x,y);
+}
 WsServer.Object.Turtle.prototype = new WsServer.Object();
 WsServer.Object.Turtle.prototype.constructor = WsServer.Object.Turtle;
 
@@ -183,7 +187,9 @@ WsServer.Object.Turtle.prototype.activate = function(player){
 //----------
 // CrossWall
 //----------
-WsServer.Object.CrossWall = function(){}
+WsServer.Object.CrossWall = function(x, y){
+    this.position = new Vector2(x,y);
+}
 WsServer.Object.CrossWall.prototype = new WsServer.Object();
 WsServer.Object.CrossWall.prototype.constructor = WsServer.Object.CrossWall;
 
@@ -199,7 +205,9 @@ WsServer.Object.CrossWall.prototype.activate = function(player){
 //----------
 // CrossLine
 //----------
-WsServer.Object.CrossLine = function(){}
+WsServer.Object.CrossLine = function(x, y){
+    this.position = new Vector2(x,y);
+}
 WsServer.Object.CrossLine.prototype = new WsServer.Object();
 WsServer.Object.CrossLine.prototype.constructor = WsServer.Object.CrossLine;
 
@@ -215,7 +223,9 @@ WsServer.Object.CrossLine.prototype.activate = function(player){
 //----------
 // Immunity
 //----------
-WsServer.Object.Immunity = function(){}
+WsServer.Object.Immunity = function(x, y){
+    this.position = new Vector2(x,y);
+}
 WsServer.Object.Immunity.prototype = new WsServer.Object();
 WsServer.Object.Immunity.prototype.constructor = WsServer.Object.Immunity;
 
