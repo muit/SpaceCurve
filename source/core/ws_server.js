@@ -14,6 +14,7 @@ exports.start = function(port)
 var WsServer = function(port)
 {
     this.io = sio(port);
+    console.log('WebSocket server running at port: ' + port);
     this.io.total = 0;
     this.io.on('connection', this.newPlayer);
 }

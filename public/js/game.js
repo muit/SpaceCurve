@@ -28,10 +28,7 @@ Game.prototype.render = function(){
 
 Game.prototype.update = function(){
     //Read input and make the logic
-    Game.prototype.objects.forEach(function(element, index, array) {
-        element.update();
-    });
-    Game.prototype.entities.forEach(function(element, index, array) {
+    this.entities.forEach(function(element, index, array) {
         element.update();
     });
 }
