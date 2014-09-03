@@ -73,14 +73,13 @@ WsServer.prototype.disconect = function(player, data){
 // Should be initialiced on a thread
 //*******************************
 WsServer.prototype.update = function(){
-    this.players.forEach(function(player, index, array) {
-        player.update();
-    }
+    new Timer(function(){
+        this.players.forEach(function(player, index, array) {
+            player.update();
+        }
 
-    this.sendInfo();
-    //Here needs a FPS controller
-
-    this.update();
+        this.sendInfo();
+    }, 40);//40fps
 }
 
 WsServer.prototype.sendInfo = function(){

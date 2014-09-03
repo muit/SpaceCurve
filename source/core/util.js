@@ -160,8 +160,20 @@ ifNotDefined = function(classPath){
     return parent;
 }
 
+//*******************************
+// Timer Class
+//*******************************
+Timer = function(oninstance, fps){
+    var speed = 1000/fps,
+        count = 0,
+        start = new Date().getTime();
 
+    function instance()
+    {
+        oninstance();
 
-
-
-
+        var diff = (new Date().getTime() - start) - (count++ * speed);
+        window.setTimeout(instance, (speed - diff));
+    }
+    window.setTimeout(instance, speed);
+}
