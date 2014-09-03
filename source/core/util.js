@@ -151,7 +151,7 @@ ifNotDefined = function(classPath){
 
     classPath = classPath.split(".");
 
-    var parent = window;
+    var parent = this;
     for(var i=0, len=classPath.length; i<len; i++){
         if(parent[classPath[i]] == undefined)
             parent[classPath[i]] = function(){};
