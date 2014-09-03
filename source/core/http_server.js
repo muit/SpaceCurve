@@ -5,7 +5,6 @@
 // Only server the html & files
 //*******************************
 
-var https = ;
 var urlParser = require('url');
 var fs = require('fs');
 

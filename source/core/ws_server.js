@@ -33,7 +33,7 @@ WsServer.prototype.players = [];
 WsServer.prototype.newPlayer = function(socket)
 {
     socket.on("login", function(name, password){
-        if(this.players.getByName(name) == undefined)
+        if(this.players.getByName(name) == undefined){
 
             var player = new Player(name, socket, 0, 0, 0);
             this.players.push(player);
@@ -77,7 +77,7 @@ WsServer.prototype.update = function(){
     new Timer(function(){
         this.players.forEach(function(player, index, array) {
             player.update();
-        }
+        });
 
         this.sendInfo();
     }, 40);//40fps
