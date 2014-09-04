@@ -73,7 +73,7 @@ Game.Object.prototype.update = function(){
 //Object Types
 //************************
 Game.Object.Bird = function(){}
-inherits(Game.Object.Bird, Game.Object);
+Game.Object.Bird.inherits(Game.Object);
 
 
 
@@ -87,7 +87,7 @@ Game.Entity.prototype.update = function(){}
 // IA Class
 //************************
 Game.IAEntity = function(){ Entity.call(this); }
-inherits(Game.IAEntity, Game.Entity);
+Game.IAEntity.inherits(Game.Entity);
 
 Game.IAEntity.prototype.update = function(){
     //IA code here
@@ -97,7 +97,7 @@ Game.IAEntity.prototype.update = function(){
 // Player Class
 //************************
 Game.Player = function(){ Entity.call(this); }
-inherits(Game.Player, Game.Entity);
+Game.Player.inherits(Game.Entity);
 
 Game.Player.prototype.update = function(){
     //Player code here
@@ -154,10 +154,7 @@ modules["input"] = Input;
 //****************************
 // Util Methods
 //****************************
-inherits = function(ownClass, superClass){
-    ownClass.prototype = new superClass();
-    ownClass.prototype.constructor = ownClass;
-}
-Function.inherits = function(superClass){
-
+Function.prototype.inherits = function(superClass){
+    this.prototype = new superClass();
+    this.prototype.constructor = this;
 }
