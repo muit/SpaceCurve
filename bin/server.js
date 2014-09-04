@@ -5,7 +5,7 @@ ws = require("../source/core/ws_server.js");
 
 //*******************************
 // HTTP SERVER
-// Only server the html & files
+// Only server the html & other files
 //*******************************
 
 httpServer = http.start(3000, {debug: false, secure: false});
