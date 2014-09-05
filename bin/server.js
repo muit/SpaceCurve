@@ -1,4 +1,4 @@
-Util = require("../source/core/util.js");
+Util = require("../source/utyl/utyl.js");
 require("../source/core/config.js");
 http = require("../source/core/http_server.js");
 ws = require("../source/core/ws_server.js");
