@@ -18,6 +18,8 @@ var WsServer = function(port)
     this.io.total = 0;
     this.io.on('connection', this.newPlayer);
 
+WsServer.prototype.players = [];
+
     console.log("Started Server Bucle.");
     this.update();
 }
@@ -31,8 +33,6 @@ WsServer.packets = {
     direction: "setDirection",
     disconect: "disconect",
 };
-
-WsServer.prototype.players = [];
 WsServer.prototype.newPlayer = function(socket)
 {
     socket.on("login", function(name, password){
@@ -70,7 +70,6 @@ WsServer.prototype.setDirection = function(player, direction){
 
 WsServer.prototype.disconect = function(player, data){
     this.players.remove(player);
-    this.io.emit('players', this.players);
 }
 
 //*******************************
@@ -81,15 +80,13 @@ WsServer.prototype.update = function(){
     var self = this;
     new Timer(function(){
         var playerData = [];
-
-        if(self.players != []){
+        if(self.players.length > 0){
             self.players.forEach(function(player, index, array) {
                 player.update();
                 playerData.push({name: player.name, x: player.position.x, y: player.position.y});
             });
+            self.sendInfo(playerData);
         }
-
-        self.sendInfo(playerData);
     }, 40);//40fps
 }
 
@@ -101,29 +98,28 @@ WsServer.prototype.sendInfo = function(playerData){
 // Component class
 // Father of everything
 //*******************************
-Component = function(x, y){
+var Component = function(x, y){
     if(x == undefined || y == undefined)
-        throw new Error("Component: Can´t create without valid coordinates.");
+        throw new Error("Component: Cant create without valid coordinates.");
 
     this.position = new Vector2(x,y);
 }
 Component.prototype.position = new Vector2(0,0);
+Component.prototype.setPosition = function(x, y){
+    this.position = new Vector2(x, y);
+}
 
 //*******************************
 // Player class
 //*******************************
-Player = function(name, socket, x, y, rad){
+var Player = function(name, socket, x, y, rad){
     if(!rad) rad = 0;
     Component.call(this, x, y);
     this.name = name;
     this.socket = socket;
     this.direction = rad;
 }
-Player.inherits(Component);
-
-Player.prototype.setPosition = function(x, y){
-    this.position = new Vector2(x, y);
-}
+Player.inherits(new Component(0,0));
 
 Player.prototype.update = function(){
     var alpha = this.direction;
@@ -136,8 +132,8 @@ Player.prototype.radius = Config.Player.radius;
 //*******************************
 // Object Class
 //*******************************
-Object = function(x, y){ Component.call(this, x, y); }
-Object.inherits(Component);
+var Object = function(x, y){ Component.call(this, x, y); }
+Object.inherits(new Component(0,0));
 
 Object.prototype.events = new EventMap();
 Object.prototype.active = new Trigger();
@@ -160,7 +156,7 @@ Object.prototype._activate = function(before, after){
 // Bird
 //----------
 Object.Bird = function(x, y){ Object.call(this, x, y); }
-Object.Bird.inherits(Object);
+Object.Bird.inherits(new Object(0, 0));
 
 Object.Bird.prototype.activate = function(player){
     function before(){
@@ -179,7 +175,7 @@ Object.Bird.prototype.activate = function(player){
 // Turtle
 //----------
 Object.Turtle = function(x, y){ Object.call(this, x, y); }
-Object.Turtle.inherits(Object);
+Object.Turtle.inherits(new Object(0, 0));
 
 Object.Turtle.prototype.activate = function(player){
     function before(){
@@ -196,7 +192,7 @@ Object.Turtle.prototype.activate = function(player){
 // CrossWall
 //----------
 Object.CrossWall = function(x, y){ Object.call(this, x, y); }
-Object.CrossWall.inherits(Object);
+Object.CrossWall.inherits(new Object(0, 0));
 
 Object.CrossWall.prototype.activate = function(player){
     function before(){
@@ -211,7 +207,7 @@ Object.CrossWall.prototype.activate = function(player){
 // CrossLine
 //----------
 Object.CrossLine = function(x, y){ Object.call(this, x, y); }
-Object.CrossLine.inherits(Object);
+Object.CrossLine.inherits(new Object(0, 0));
 
 Object.CrossLine.prototype.activate = function(player){
     function before(){
@@ -226,7 +222,7 @@ Object.CrossLine.prototype.activate = function(player){
 // Immunity
 //----------
 Object.Immunity = function(x, y){ Object.call(this, x, y); }
-Object.Immunity.inherits(Object);
+Object.Immunity.inherits(new Object(0, 0));
 
 Object.Immunity.prototype.activate = function(player){
     function before(){

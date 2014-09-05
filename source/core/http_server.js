@@ -31,7 +31,7 @@ var HttpServer = function(port, options){
     else
         this.debug = options.debug;
     
-    if (options.secure == undefined || !secure){
+    if (options.secure == undefined || !options.secure){
         var http = require('http');
         var server = http.createServer(function(request, response){
             self.serve(self, request, response);
