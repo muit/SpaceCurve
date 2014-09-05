@@ -177,3 +177,12 @@ Timer = function(oninstance, fps){
     }
     setTimeout(instance, speed);
 }
+
+
+//*******************************
+// Inherits method
+//*******************************
+Function.prototype.inherits = function(superClass){
+    this.prototype = new superClass();
+    this.prototype.constructor = this;
+}

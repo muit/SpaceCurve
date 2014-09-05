@@ -80,63 +80,69 @@ WsServer.prototype.disconect = function(player, data){
 WsServer.prototype.update = function(){
     var self = this;
     new Timer(function(){
-        self.players.forEach(function(player, index, array) {
-            player.update();
-        });
+        var playerData = [];
 
-        self.sendInfo();
+        if(self.players != []){
+            self.players.forEach(function(player, index, array) {
+                player.update();
+                playerData.push({name: player.name, x: player.position.x, y: player.position.y});
+            });
+        }
+
+        self.sendInfo(playerData);
     }, 40);//40fps
 }
 
-WsServer.prototype.sendInfo = function(){
-    var playerData = {};
-    this.players.forEach(function(player, index){
-         playerData[index] = {name: player.name, x: player.position.x, y: player.position.y};
-    });
-    this.io.emit("info", playerData);
+WsServer.prototype.sendInfo = function(playerData){
+    this.io.emit("info", {players: playerData});
 }
+
+//*******************************
+// Component class
+// Father of everything
+//*******************************
+Component = function(x, y){
+    if(x == undefined || y == undefined)
+        throw new Error("Component: Can´t create without valid coordinates.");
+
+    this.position = new Vector2(x,y);
+}
+Component.prototype.position = new Vector2(0,0);
 
 //*******************************
 // Player class
 //*******************************
-WsServer.Player = function(name, socket, x, y, rad){
-    if(!x) x = 0;
-    if(!y) y = 0;
+Player = function(name, socket, x, y, rad){
     if(!rad) rad = 0;
-
+    Component.call(this, x, y);
     this.name = name;
     this.socket = socket;
-    this.position = new Vector2(x, y);
     this.direction = rad;
 }
+Player.inherits(Component);
 
-WsServer.Player.prototype.setPosition = function(x, y){
+Player.prototype.setPosition = function(x, y){
     this.position = new Vector2(x, y);
 }
 
-WsServer.Player.prototype.update = function(){
+Player.prototype.update = function(){
     var alpha = this.direction;
     this.position.x += this.speed * Math.cos(alpha);
     this.position.y += this.speed * Math.sin(alpha);
 }
-
-
-WsServer.Player.prototype.speed = Config.Player.speed;
-WsServer.Player.prototype.radius = Config.Player.radius;
+Player.prototype.speed = Config.Player.speed;
+Player.prototype.radius = Config.Player.radius;
 
 //*******************************
 // Object Class
 //*******************************
-WsServer.Object = function(){}
+Object = function(x, y){ Component.call(this, x, y); }
+Object.inherits(Component);
 
-WsServer.Object.prototype.update = function(){
+Object.prototype.events = new EventMap();
+Object.prototype.active = new Trigger();
 
-}
-
-WsServer.Object.prototype.events = new EventMap();
-WsServer.Object.prototype.active = new Trigger();
-
-WsServer.Object.prototype._activate = function(before, after){
+Object.prototype._activate = function(before, after){
     if(this.active.get()){
         before();
         this.events.createEvent(function(){
@@ -153,13 +159,10 @@ WsServer.Object.prototype._activate = function(before, after){
 //----------
 // Bird
 //----------
-WsServer.Object.Bird = function(x, y){
-    this.position = new Vector2(x,y);
-}
-WsServer.Object.Bird.prototype = new WsServer.Object();
-WsServer.Object.Bird.prototype.constructor = WsServer.Object.Bird;
+Object.Bird = function(x, y){ Object.call(this, x, y); }
+Object.Bird.inherits(Object);
 
-WsServer.Object.Bird.prototype.activate = function(player){
+Object.Bird.prototype.activate = function(player){
     function before(){
         //When Object is Catched:
         player.speed *= 2;
@@ -175,13 +178,10 @@ WsServer.Object.Bird.prototype.activate = function(player){
 //----------
 // Turtle
 //----------
-WsServer.Object.Turtle = function(x, y){
-    this.position = new Vector2(x,y);
-}
-WsServer.Object.Turtle.prototype = new WsServer.Object();
-WsServer.Object.Turtle.prototype.constructor = WsServer.Object.Turtle;
+Object.Turtle = function(x, y){ Object.call(this, x, y); }
+Object.Turtle.inherits(Object);
 
-WsServer.Object.Turtle.prototype.activate = function(player){
+Object.Turtle.prototype.activate = function(player){
     function before(){
         player.speed /= 2;
     };
@@ -195,13 +195,10 @@ WsServer.Object.Turtle.prototype.activate = function(player){
 //----------
 // CrossWall
 //----------
-WsServer.Object.CrossWall = function(x, y){
-    this.position = new Vector2(x,y);
-}
-WsServer.Object.CrossWall.prototype = new WsServer.Object();
-WsServer.Object.CrossWall.prototype.constructor = WsServer.Object.CrossWall;
+Object.CrossWall = function(x, y){ Object.call(this, x, y); }
+Object.CrossWall.inherits(Object);
 
-WsServer.Object.CrossWall.prototype.activate = function(player){
+Object.CrossWall.prototype.activate = function(player){
     function before(){
     };
     function after(){
@@ -213,13 +210,10 @@ WsServer.Object.CrossWall.prototype.activate = function(player){
 //----------
 // CrossLine
 //----------
-WsServer.Object.CrossLine = function(x, y){
-    this.position = new Vector2(x,y);
-}
-WsServer.Object.CrossLine.prototype = new WsServer.Object();
-WsServer.Object.CrossLine.prototype.constructor = WsServer.Object.CrossLine;
+Object.CrossLine = function(x, y){ Object.call(this, x, y); }
+Object.CrossLine.inherits(Object);
 
-WsServer.Object.CrossLine.prototype.activate = function(player){
+Object.CrossLine.prototype.activate = function(player){
     function before(){
     };
     function after(){
@@ -231,13 +225,10 @@ WsServer.Object.CrossLine.prototype.activate = function(player){
 //----------
 // Immunity
 //----------
-WsServer.Object.Immunity = function(x, y){
-    this.position = new Vector2(x,y);
-}
-WsServer.Object.Immunity.prototype = new WsServer.Object();
-WsServer.Object.Immunity.prototype.constructor = WsServer.Object.Immunity;
+Object.Immunity = function(x, y){ Object.call(this, x, y); }
+Object.Immunity.inherits(Object);
 
-WsServer.Object.Immunity.prototype.activate = function(player){
+Object.Immunity.prototype.activate = function(player){
     function before(){
     };
     function after(){
