@@ -163,16 +163,17 @@ ifNotDefined = function(classPath){
 //*******************************
 // Timer Class
 //*******************************
-Timer = function(oninstance, fps){
+Timer = function(oninstance, fps, times){
     var speed = 1000/fps,
         count = 0,
         start = new Date().getTime();
 
     function instance()
     {
-        oninstance();
+        if(times == undefined || count++ <= times)
+            oninstance();
 
-        var diff = (new Date().getTime() - start) - (count++ * speed);
+        var diff = (new Date().getTime() - start) - (count * speed);
         setTimeout(instance, (speed - diff));
     }
     setTimeout(instance, speed);
@@ -183,6 +184,9 @@ Timer = function(oninstance, fps){
 // Inherits method
 //*******************************
 Function.prototype.inherits = function(superClass){
-    this.prototype = new superClass();
+    if(typeof superClass == "function")
+        this.prototype = new superClass();
+    else
+        this.prototype = superClass;
     this.prototype.constructor = this;
 }
