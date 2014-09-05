@@ -19,7 +19,7 @@ Game.prototype.objects = [];
 Game.prototype.entities = [];
 
 Game.prototype.render = function(){
-    this.__proto__.update();
+    this.update();
 
     this.renderer.render(this.scene, this.camera); 
     if(!this.done)
@@ -28,7 +28,7 @@ Game.prototype.render = function(){
 
 Game.prototype.update = function(){
     //Read input and make the logic
-    this.__proto__.entities.forEach(function(element, index, array) {
+    this.entities.forEach(function(element, index, array) {
         element.update();
     });
 }

@@ -31,6 +31,8 @@ var HttpServer = function(port, options){
     else
         this.debug = options.debug;
     
+    this.files = {};
+
     if (options.secure == undefined || !options.secure){
         var http = require('http');
         var server = http.createServer(function(request, response){
@@ -55,8 +57,6 @@ var HttpServer = function(port, options){
         console.log('Http server running at port: ' + port);
     });
 }
-
-HttpServer.prototype.files = {};
 
 //*******************************
 // Serve files or code
@@ -90,17 +90,34 @@ HttpServer.prototype.serve = function(self, request, response){
 //*******************************
 // Serve index.html
 HttpServer.prototype.serveHome = function(self, request, response){
-    self.serveFile(200, 'index.html', response);
+    self.serveFile(200, '/index.html', response);
 }
 
 //*******************************
 // Serve js or css
 HttpServer.prototype.serveFile = function(status, file, response){
     var self = this, 
-        path = 'public/' + file;
+        path = 'public' + file;
+    
+    function writeResponse(data, response){
+        var type = 'text/html';
+
+        if (file.endsWith('.js'))
+            type = 'text/javascript';
+
+        if (file.endsWith('.css'))
+            type = 'text/css';
+
+        response.writeHead(status, {
+            'Content-Length': data.length,
+            'Content-Type': type
+        });
+
+        response.end(data);
+    }
 
     if(this.debug || this.files[path] == undefined){
-        fs.readFile('public/' + file, function(err, data) {
+        fs.readFile(path, function(err, data) {
             if (err)
             {
                 response.writeHead(404, {
@@ -110,25 +127,11 @@ HttpServer.prototype.serveFile = function(status, file, response){
                 return;
             }
 
-            var type = 'text/html';
-
-            if (file.endsWith('.js'))
-                type = 'text/javascript';
-
-            if (file.endsWith('.css'))
-                type = 'text/css';
-
-            response.writeHead(status, {
-                'Content-Length': data.length,
-                'Content-Type': type
-            });
-
-            response.end(data);
-
-            if(!self.debug) self.files[path] = response;
+            if(!self.debug) self.files[path] = data;
+            writeResponse(data, response);
         });
     }
     else{
-        response = this.files[path];
+        writeResponse(this.files[path], response);
     }
 }
