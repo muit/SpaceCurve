@@ -59,52 +59,69 @@ Game.prototype.update = function(){
         element.update();
     });
 }
+//*************************************************************************
+// Component Class
+// Father of everything
+//************************
+Game.Component = function(){}
+
+//*************************************************************************
+// Entity Class
+//************************
+Game.Entity = function(color){
+    this.setColor(color);
+}
+Game.Entity.inherits(Game.Component);
+
+Game.Entity.setColor = function(color){
+    if(color == "random")
+        this.color = new RGB(Math.randomRange(0,255),Math.randomRange(0,255),Math.randomRange(0,255));
+    else if(color instanceof RGB || color instanceof RGBA)
+        this.color = color;
+}
+
+//************************
+// IA Class
+//************************
+Game.IAEntity = function(){ Entity.call(this, "random"); }
+Game.IAEntity.inherits(Game.Entity);
+
+//************************
+// Player Class
+//************************
+Game.Player = function(){ Entity.call(this, "random"); }
+Game.Player.inherits(Game.Entity);
 
 //*************************************************************************
 // Object Class
 //************************
 Game.Object = function(){}
-
-Game.Object.prototype.update = function(){
-
-}
-
+Game.Object.inherits(Game.Component);
+Game.Object.icon = "img/object.png";
 //************************
 //Object Types
 //************************
 Game.Object.Bird = function(){}
 Game.Object.Bird.inherits(Game.Object);
+Game.Object.Bird.icon = "img/object_bird.png";
 
+Game.Object.Turtle = function(){}
+Game.Object.Turtle.inherits(Game.Object);
+Game.Object.Turtle.icon = "img/object_turtle.png";
 
+Game.Object.CrossWall = function(){}
+Game.Object.CrossWall.inherits(Game.Object);
+Game.Object.CrossWall.icon = "img/object_crosswall.png";
 
-//*************************************************************************
-// Entity Class
-//************************
-Game.Entity = function(){}
-Game.Entity.prototype.update = function(){}
+Game.Object.CrossLine = function(){}
+Game.Object.CrossLine.inherits(Game.Object);
+Game.Object.CrossLine.icon = "img/object_crossline.png";
 
-//************************
-// IA Class
-//************************
-Game.IAEntity = function(){ Entity.call(this); }
-Game.IAEntity.inherits(Game.Entity);
+Game.Object.Immunity = function(){}
+Game.Object.Immunity.inherits(Game.Object);
+Game.Object.Immunity.icon = "img/object_immunity.png";
 
-Game.IAEntity.prototype.update = function(){
-    //IA code here
-}
-
-//************************
-// Player Class
-//************************
-Game.Player = function(){ Entity.call(this); }
-Game.Player.inherits(Game.Entity);
-
-Game.Player.prototype.update = function(){
-    //Player code here
-}
 modules["game"] = Game;
-
-
 
 Input = function(game){
 
@@ -157,6 +174,9 @@ modules["input"] = Input;
 // Util Methods
 //****************************
 Function.prototype.inherits = function(superClass){
-    this.prototype = new superClass();
+    if(typeof superClass == "function")
+        this.prototype = new superClass();
+    else
+        this.prototype = superClass;
     this.prototype.constructor = this;
 }
