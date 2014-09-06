@@ -1,6 +1,7 @@
+document.host=document.URL.split("/")[2].split(":")[0];
 
 Network = function(port){
-    this.socket = io.connect(document.URL+":"+port, {secure: true});
+    this.socket = io.connect(document.host+":"+port, {secure: true});
 }
 Network.prototype.login = function(name, password){
     var self = this;
