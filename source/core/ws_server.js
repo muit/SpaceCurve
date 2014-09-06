@@ -138,15 +138,18 @@ Object.inherits(new Component(0,0));
 Object.prototype.events = new EventMap();
 Object.prototype.active = new Trigger();
 
-Object.prototype._activate = function(before, after){
+Object.prototype.activate = function(player)){
     if(this.active.get()){
-        before();
+        this.before_activate(player);
+
         this.events.createEvent(function(){
             this.active.reset();
-            after();
-        }, Config.Object.duration)
+            this.after_activate(player);
+        }, Config.Object.duration);
     }
 }
+Object.prototype.before_activate = function(player){}
+Object.prototype.after_activate = function(player){}
 
 //************************
 //Object Types
@@ -158,15 +161,12 @@ Object.prototype._activate = function(before, after){
 Object.Bird = function(x, y){ Object.call(this, x, y); }
 Object.Bird.inherits(new Object(0, 0));
 
-Object.Bird.prototype.activate = function(player){
-    function before(){
-        //When Object is Catched:
-        player.speed *= 2;
-    };
-    function after(){
-        //When Object has Finished:
-        player.speed /= 2;
-    };
+Object.Bird.prototype.before_activate = function(player){
+    player.speed *= 2;
+};
+Object.Bird.prototype.after_activate = function(player){
+    player.speed /= 2;
+};
 
     this._activate(before, after);
 }
@@ -177,16 +177,12 @@ Object.Bird.prototype.activate = function(player){
 Object.Turtle = function(x, y){ Object.call(this, x, y); }
 Object.Turtle.inherits(new Object(0, 0));
 
-Object.Turtle.prototype.activate = function(player){
-    function before(){
-        player.speed /= 2;
-    };
-    function after(){
-        player.speed *= 2;
-    };
-
-    this._activate(before, after);
-}
+Object.Turtle.prototype.before_activate = function(player){
+    player.speed /= 2;
+};
+Object.Turtle.prototype.after_activate = function(player){
+    player.speed *= 2;
+};
 
 //----------
 // CrossWall
@@ -194,14 +190,8 @@ Object.Turtle.prototype.activate = function(player){
 Object.CrossWall = function(x, y){ Object.call(this, x, y); }
 Object.CrossWall.inherits(new Object(0, 0));
 
-Object.CrossWall.prototype.activate = function(player){
-    function before(){
-    };
-    function after(){
-    };
-
-    this._activate(before, after);
-}
+Object.CrossWall.prototype.before_activate = function(player){};
+Object.CrossWall.prototype.after_activate = function(player){};
 
 //----------
 // CrossLine
@@ -209,14 +199,8 @@ Object.CrossWall.prototype.activate = function(player){
 Object.CrossLine = function(x, y){ Object.call(this, x, y); }
 Object.CrossLine.inherits(new Object(0, 0));
 
-Object.CrossLine.prototype.activate = function(player){
-    function before(){
-    };
-    function after(){
-    };
-
-    this._activate(before, after);
-}
+Object.CrossLine.prototype.before_activate = function(player){};
+Object.CrossLine.prototype.after_activate = function(player){};
 
 //----------
 // Immunity
@@ -224,11 +208,5 @@ Object.CrossLine.prototype.activate = function(player){
 Object.Immunity = function(x, y){ Object.call(this, x, y); }
 Object.Immunity.inherits(new Object(0, 0));
 
-Object.Immunity.prototype.activate = function(player){
-    function before(){
-    };
-    function after(){
-    };
-
-    this._activate(before, after);
-}
+Object.Immunity.prototype.before_activate = function(player){};
+Object.Immunity.prototype.after_activate = function(player){};
