@@ -13,14 +13,13 @@ exports.start = function(port)
 
 var WsServer = function(port)
 {
+    var self = this;
     this.io = sio(port);
-    console.log('WebSocket server running at port: ' + port);
+    console.log('WSServer: Running at port: ' + port);
     this.io.total = 0;
-    this.io.on('connection', this.newPlayer);
+    this.io.on('connection', function(socket){ self.newPlayer(socket); });
 
-WsServer.prototype.players = [];
-
-    console.log("Started Server Bucle.");
+    console.log("WSServer: Started game Bucle.");
     this.update();
 }
 
@@ -33,20 +32,26 @@ WsServer.packets = {
     direction: "setDirection",
     disconect: "disconect",
 };
+
+WsServer.prototype.players = [];
 WsServer.prototype.newPlayer = function(socket)
 {
+    var self = this;
+    process.stdout.write("\nWSServer: New connection.");
+
     socket.on("login", function(name, password){
-        if(this.players.getByName(name) == undefined){
-            socket.emit("login", true, "Logged in succesfully");
+        if(self.players.getByName(name) == undefined){
+            console.log(" "+name+" logged in succesfully.");
+            socket.emit("login", true, "Logged in succesfully.");
 
             var player = new Player(name, socket, 0, 0, 0);
-            this.players.push(player);
+            self.players.push(player);
 
             //Create Events for all packets
             for(var opcode in WsServer.packets)
             {
                 //Get function name from opcode
-                var callback = WsServer.prototype[WsServer.packets[opcode]];
+                var callback = self[WsServer.packets[opcode]];
                 
                 //Create Event
                 socket.on(opcode, function(data){
@@ -56,6 +61,7 @@ WsServer.prototype.newPlayer = function(socket)
         }
         else
         {
+            console.log(" "+name+" couldn't log in.");
             socket.emit("login", true, "Could not login with that credentials.");
         }
     });
@@ -80,6 +86,7 @@ WsServer.prototype.update = function(){
     var self = this;
     new Timer(function(){
         var playerData = [];
+        
         if(self.players.length > 0){
             self.players.forEach(function(player, index, array) {
                 player.update();
@@ -138,7 +145,7 @@ Object.inherits(new Component(0,0));
 Object.prototype.events = new EventMap();
 Object.prototype.active = new Trigger();
 
-Object.prototype.activate = function(player)){
+Object.prototype.activate = function(player){
     if(this.active.get()){
         this.before_activate(player);
 
@@ -163,12 +170,9 @@ Object.Bird.inherits(new Object(0, 0));
 
 Object.Bird.prototype.before_activate = function(player){
     player.speed *= 2;
-};
+}
 Object.Bird.prototype.after_activate = function(player){
     player.speed /= 2;
-};
-
-    this._activate(before, after);
 }
 
 //----------
@@ -179,10 +183,10 @@ Object.Turtle.inherits(new Object(0, 0));
 
 Object.Turtle.prototype.before_activate = function(player){
     player.speed /= 2;
-};
+}
 Object.Turtle.prototype.after_activate = function(player){
     player.speed *= 2;
-};
+}
 
 //----------
 // CrossWall
@@ -190,8 +194,8 @@ Object.Turtle.prototype.after_activate = function(player){
 Object.CrossWall = function(x, y){ Object.call(this, x, y); }
 Object.CrossWall.inherits(new Object(0, 0));
 
-Object.CrossWall.prototype.before_activate = function(player){};
-Object.CrossWall.prototype.after_activate = function(player){};
+Object.CrossWall.prototype.before_activate = function(player){}
+Object.CrossWall.prototype.after_activate = function(player){}
 
 //----------
 // CrossLine
@@ -199,8 +203,8 @@ Object.CrossWall.prototype.after_activate = function(player){};
 Object.CrossLine = function(x, y){ Object.call(this, x, y); }
 Object.CrossLine.inherits(new Object(0, 0));
 
-Object.CrossLine.prototype.before_activate = function(player){};
-Object.CrossLine.prototype.after_activate = function(player){};
+Object.CrossLine.prototype.before_activate = function(player){}
+Object.CrossLine.prototype.after_activate = function(player){}
 
 //----------
 // Immunity
@@ -208,5 +212,5 @@ Object.CrossLine.prototype.after_activate = function(player){};
 Object.Immunity = function(x, y){ Object.call(this, x, y); }
 Object.Immunity.inherits(new Object(0, 0));
 
-Object.Immunity.prototype.before_activate = function(player){};
-Object.Immunity.prototype.after_activate = function(player){};
+Object.Immunity.prototype.before_activate = function(player){}
+Object.Immunity.prototype.after_activate = function(player){}
