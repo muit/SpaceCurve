@@ -18,9 +18,14 @@ Network.prototype.signup = function(name, email, password){
 }
 
 Network.prototype.onPlayers = function(callback){
-    this.socket.on("players", callback);
+    this.socket.on("players", function(data){ 
+        callback(data.players); 
+    });
 }
 
 Network.prototype.onObjects = function(callback){
-    this.socket.on("objects", callback);
+    this.socket.on("objects", function(data){ 
+        callback(data.objects); 
+    });
 }
+
