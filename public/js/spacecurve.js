@@ -29,7 +29,6 @@ modules = {};
  * directly, but its subclasses are the building blocks for SGF games.
  **/
 function Game(){
-    this.done = false;
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(45, window.innerWidth, window.innerHeight, 0.1, 1000);
     this.renderer = new THREE.WebGLRenderer();
@@ -38,32 +37,50 @@ function Game(){
     this.renderer.setSize(window.innerWidth, window.innerHeight);
 
     $("#canvas").append(this.renderer.domElement);
-
-    this.render();
 };
+
+Game.prototype.start = function(){
+    this.done = false;
+    this.bucle();
+}
+
+Game.prototype.pause = function(){
+    this.done = true;
+}
 
 Game.prototype.objects = [];
 Game.prototype.entities = [];
 
-Game.prototype.render = function(){
+Game.prototype.bucle = function(){
     this.update();
+    this.render();
 
+    if(!this.done){
+        //Need a benchmark (Utyl Timer vs. Three.js frames)
+        requestAnimationFrame(this.bucle);
+    }
+}
+Game.prototype.render = function(){
     this.renderer.render(this.scene, this.camera); 
-    if(!this.done)
-        requestAnimationFrame(this.render);
 }
 
 Game.prototype.update = function(){
-    //Read input and make the logic
-    this.entities.forEach(function(element, index, array) {
-        element.update();
-    });
+    //Nothing to do :D
 }
 //*************************************************************************
 // Component Class
 // Father of everything
 //************************
-Game.Component = function(){}
+Game.Component = function(x, y){
+    if(x == undefined || y == undefined)
+        throw new Error("Component: Cant create without valid coordinates.");
+
+    this.position = new Vector2(x,y);
+}
+Component.prototype.position = new Vector2(0,0);
+Component.prototype.setPosition = function(x, y){
+    this.position = new Vector2(x, y);
+}
 
 //*************************************************************************
 // Entity Class
@@ -71,7 +88,7 @@ Game.Component = function(){}
 Game.Entity = function(color){
     this.setColor(color);
 }
-Game.Entity.inherits(Game.Component);
+Game.Entity.inherits(new Game.Component(0,0));
 
 Game.Entity.setColor = function(color){
     if(color == "random")
@@ -96,7 +113,7 @@ Game.Player.inherits(Game.Entity);
 // Object Class
 //************************
 Game.Object = function(){}
-Game.Object.inherits(Game.Component);
+Game.Object.inherits(new Game.Component(0,0));
 Game.Object.icon = "img/object.png";
 //************************
 //Object Types
