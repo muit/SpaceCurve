@@ -54,7 +54,9 @@ var HttpServer = function(port, options){
     
 
     server.listen(port, function() {
-        console.log('Http server running at port: ' + port);
+        console.log('HttpServer: Running at port:   ' + port);
+        console.log('HttpServer: Secure mode(https) ' + ((options.secure)?"enabled":"disabled"));
+        console.log('HttpServer: Debug mode         ' + ((options.debug)?"enabled":"disabled"));
     });
 }
 
