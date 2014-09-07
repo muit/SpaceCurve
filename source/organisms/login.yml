@@ -9,7 +9,7 @@ children:
         - Molecule.Form:
             children:
               - Atom.Label:
-                  value: "Username:"
+                  value: "Username/email:"
               - Atom.Input:
                   type: text
                   name: username
