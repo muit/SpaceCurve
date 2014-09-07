@@ -19,14 +19,17 @@ Network.prototype.signup = function(name, email, password){
     //Not yet
 }
 
-Network.prototype.signup = function(name, email, password){
-    //Not yet
-}
-
 Network.prototype.onInfo = function(players, objects){
-    this.socket.on("objects", function(data){ 
+    this.socket.on("info", function(data){ 
         players(data.players);
         objects(data.objects);
     });
 }
 
+Network.prototype.getGames = function(games){
+    this.socket.emit("games");
+    this.socket.on("games", function(data){
+        self.socket.removeAllListeners("games");
+        games(data.games);
+    });
+}

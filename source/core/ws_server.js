@@ -28,6 +28,7 @@ var WsServer = function(port)
 WsServer.packets = {
     direction: "setDirection",
     disconect: "disconect",
+    games: "getGames",
 };
 
 WsServer.prototype.players = [];
@@ -64,6 +65,19 @@ WsServer.prototype.newPlayer = function(socket)
     });
 }
 
+WsServer.prototype.games = [];
+
+WsServer.prototype.newGame = function(name, player){
+    if(!player.inGame){
+        this.games.push(new Game(name));
+        this.games.last.addPlayer(player);
+    }
+}
+
+WsServer.prototype.removeGame = function(game){
+    this.games.remove(game);
+}
+
 //*******************************
 //Packet Callbacks
 //*******************************
@@ -75,10 +89,20 @@ WsServer.prototype.disconect = function(player, data){
     this.players.remove(player);
 }
 
-WsServer.prototype.games = [];
-WsServer.prototype.newGame = function(name){
-    this.games.push(new Game(name));
+WsServer.prototype.getGames = function(player /*,data*/){
+    var games = [];
+    this.games.forEach(function(game){
+        games.push({
+            name: game.name, 
+            playerAmount: game.players.length+"/".Config.Game.maxPlayers,
+            playing: game.started
+        });
+    });
+
+    player.socket.emit("games", {games: games});
 }
+
+
 
 //*******************************
 // Game class
@@ -86,7 +110,7 @@ WsServer.prototype.newGame = function(name){
 //*******************************
 var Game = function(name){
     this.name = name;
-    this.done = false;
+    this.started = false;
     console.log("WSServer: Created new game '"+name+"'");
 }
 Game.prototype.events = new EventMap();
@@ -99,19 +123,21 @@ Game.prototype.waitRound = function(){
     this.started = false;
     this.events.createEvent(function(){
         self.startRound();
-    }, 5000);
+    }, Config.Game.waitTime);
 }
 Game.prototype.startRound = function(){
     var self = this;
     this.started = true;
 
     this.players.forEach(function(player){
-
-    })
+        var x = Math.randomRange(0, Config.Map.width);
+        var y = Math.randomRange(0, Config.Map.height);
+        player.position = new Vector2(x, y);
+    });
 
     new Timer(function(){
         self.update();
-        return self.done;
+        return !self.started;
     }, 25);//40fps
 }
 Game.prototype.endRound = function(){
@@ -121,16 +147,23 @@ Game.prototype.endRound = function(){
 
 Game.prototype.players = [];
 Game.prototype.addPlayer = function(player){
-    if(!player.inGame){
-        player.inGame = true;
-        this.players.push(player);
-        return true;
+    if(players.length < Config.Game.maxPlayers){
+        if(!player.inGame){
+            player.inGame = true;
+            player.game = this;
+            this.players.push(player);
+            return true;
+        }
     }
     return false;
 }
 Game.prototype.kickPlayer = function(player){
     player.inGame = false;
+    player.game = null;
     this.players.remove(player);
+
+    if(this.players.length <= 0)
+        websocketServer.removeGame(this);
 }
 
 Game.prototype.objects = [];
@@ -142,6 +175,7 @@ Game.prototype.removeObject = function(object){
     object.game = null;
     this.objects.remove(object);
 }
+
 //*******************************
 // Periodic Update
 //*******************************
@@ -154,7 +188,8 @@ Game.prototype.update = function(){
                 name: player.name, 
                 x: player.position.x, 
                 y: player.position.y,
-                alive: player.alive
+                alive: player.alive,
+                score: player.score
             });
         });
 
@@ -167,11 +202,12 @@ Game.prototype.update = function(){
             });
         });
 
-        this.emitPlayers("info", {players: playerData, objects: objectData});
+        //Need A LOT of optimization! 
+        this.emit("info", {players: playerData, objects: objectData});
     }
 }
 
-Game.prototype.emitPlayers = function(opcode, data){
+Game.prototype.emit = function(opcode, data){
     this.players.forEach(function(player){
         player.socket.emit(opcode, data);
     });
@@ -204,6 +240,7 @@ var Player = function(name, socket, x, y, rad, game){
     this.inGame = false;
     this.name = name;
     this.alive = true;
+    this.score = 0;
     this.socket = socket;
     this.direction = rad;
 }
