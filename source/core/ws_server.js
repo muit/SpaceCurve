@@ -37,12 +37,12 @@ WsServer.prototype.players = [];
 WsServer.prototype.newPlayer = function(socket)
 {
     var self = this;
-    process.stdout.write("\nWSServer: New connection.");
+    console.log("WSServer: New connection.");
 
     socket.on("login", function(name, password){
         if(self.players.getByName(name) == undefined){
-            console.log(" "+name+" logged in succesfully.");
-            socket.emit("login", true, "Logged in succesfully.");
+            console.log("          "+name+" logged in succesfully.");
+            socket.emit("login", {error: false, msg: "Logged in succesfully."});
 
             var player = new Player(name, socket, 0, 0, 0);
             self.players.push(player);
@@ -61,8 +61,8 @@ WsServer.prototype.newPlayer = function(socket)
         }
         else
         {
-            console.log(" "+name+" couldn't log in.");
-            socket.emit("login", true, "Could not login with that credentials.");
+            console.log("          "+name+" couldn't log in.");
+            socket.emit("login", {error: true, msg: "Could not login. That name is occuped."});
         }
     });
 }
@@ -78,38 +78,117 @@ WsServer.prototype.disconect = function(player, data){
     this.players.remove(player);
 }
 
-//*******************************
-// Periodic Update
-// Should be initialiced on a thread
-//*******************************
-WsServer.prototype.update = function(){
-    var self = this;
-    new Timer(function(){
-        var playerData = [];
-        
-        if(self.players.length > 0){
-            self.players.forEach(function(player, index, array) {
-                player.update();
-                playerData.push({name: player.name, x: player.position.x, y: player.position.y});
-            });
-            self.sendInfo(playerData);
-        }
-    }, 40);//40fps
+WsServer.prototype.games = [];
+WsServer.prototype.newGame = function(name){
+    this.games.push(new Game(name));
 }
 
-WsServer.prototype.sendInfo = function(playerData){
-    this.io.emit("info", {players: playerData});
+//*******************************
+// Game class
+// Each instance is a diferent game.
+//*******************************
+Game = function(name){
+    this.name = name;
+    this.done = false;
+}
+Game.prototype.events = new EventMap();
+
+Game.prototype.start = function(){
+    this.waitRound();
+}
+Game.prototype.waitRound = function(){
+    var self = this;
+    this.started = false;
+    this.events.createEvent(function(){
+        self.startRound();
+    }, 5000);
+}
+Game.prototype.startRound = function(){
+    var self = this;
+    this.started = true;
+
+    this.players.forEach(function(player){
+
+    })
+
+    new Timer(function(){
+        self.update();
+        return self.done;
+    }, 25);//40fps
+}
+Game.prototype.endRound = function(){
+    this.started = false;
+    this.waitRound();
+}
+
+Game.prototype.players = [];
+Game.prototype.addPlayer = function(player){
+    if(!player.inGame){
+        player.inGame = true;
+        this.players.push(player);
+        return true;
+    }
+    return false;
+}
+Game.prototype.kickPlayer = function(player){
+    player.inGame = false;
+    this.players.remove(player);
+}
+
+Game.prototype.objects = [];
+Game.prototype.addObject = function(object){
+    object.game = this;
+    this.objects.push(object);
+}
+Game.prototype.removeObject = function(object){
+    object.game = null;
+    this.objects.remove(object);
+}
+//*******************************
+// Periodic Update
+//*******************************
+Game.prototype.update = function(){
+    if(this.players.length > 0){
+        var playerData = [];
+        this.players.forEach(function(player) {
+            player.update();
+            playerData.push({
+                name: player.name, 
+                x: player.position.x, 
+                y: player.position.y,
+                alive: player.alive
+            });
+        });
+
+        var objectData = [];
+        this.objects.forEach(function(object) {
+            objectData.push({
+                type: object.constructor.name, 
+                x: object.position.x, 
+                y: object.position.y
+            });
+        });
+
+        this.emitPlayers("info", {players: playerData, objects: objectData});
+    }
+}
+
+Game.prototype.emitPlayers = function(opcode, data)){
+    this.players.forEach(function(player){
+        player.socket.emit(opcode, data);
+    });
 }
 
 //*******************************
 // Component class
 // Father of everything
 //*******************************
-var Component = function(x, y){
+var Component = function(x, y, game){
     if(x == undefined || y == undefined)
         throw new Error("Component: Cant create without valid coordinates.");
 
     this.position = new Vector2(x,y);
+    this.game = game;
 }
 Component.prototype.position = new Vector2(0,0);
 Component.prototype.setPosition = function(x, y){
@@ -119,10 +198,14 @@ Component.prototype.setPosition = function(x, y){
 //*******************************
 // Player class
 //*******************************
-var Player = function(name, socket, x, y, rad){
+var Player = function(name, socket, x, y, rad, game){
     if(!rad) rad = 0;
-    Component.call(this, x, y);
+
+    Component.call(this, x, y, game);
+
+    this.inGame = false;
     this.name = name;
+    this.alive = true;
     this.socket = socket;
     this.direction = rad;
 }
@@ -139,7 +222,7 @@ Player.prototype.radius = Config.Player.radius;
 //*******************************
 // Object Class
 //*******************************
-var Object = function(x, y){ Component.call(this, x, y); }
+var Object = function(x, y, game){ Component.call(this, x, y, game); }
 Object.inherits(new Component(0,0));
 
 Object.prototype.events = new EventMap();
@@ -152,6 +235,8 @@ Object.prototype.activate = function(player){
         this.events.createEvent(function(){
             this.active.reset();
             this.after_activate(player);
+            //Possible error: can not remove himself
+            this.game.removeObject(this);
         }, Config.Object.duration);
     }
 }
