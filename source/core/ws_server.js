@@ -165,8 +165,9 @@ Object.prototype.after_activate = function(player){}
 //----------
 // Bird
 //----------
-Object.Bird = function(x, y){ Object.call(this, x, y); }
+Object.Bird = function(x, y, game){ Object.call(this, x, y, game); }
 Object.Bird.inherits(new Object(0, 0));
+Object.Bird.name = "Bird";
 
 Object.Bird.prototype.before_activate = function(player){
     player.speed *= 2;
@@ -178,8 +179,9 @@ Object.Bird.prototype.after_activate = function(player){
 //----------
 // Turtle
 //----------
-Object.Turtle = function(x, y){ Object.call(this, x, y); }
+Object.Turtle = function(x, y, game){ Object.call(this, x, y, game); }
 Object.Turtle.inherits(new Object(0, 0));
+Object.Turtle.name = "Turtle";
 
 Object.Turtle.prototype.before_activate = function(player){
     player.speed /= 2;
@@ -191,8 +193,9 @@ Object.Turtle.prototype.after_activate = function(player){
 //----------
 // CrossWall
 //----------
-Object.CrossWall = function(x, y){ Object.call(this, x, y); }
+Object.CrossWall = function(x, y, game){ Object.call(this, x, y, game); }
 Object.CrossWall.inherits(new Object(0, 0));
+Object.CrossWall.name = "CrossWall";
 
 Object.CrossWall.prototype.before_activate = function(player){}
 Object.CrossWall.prototype.after_activate = function(player){}
@@ -200,8 +203,9 @@ Object.CrossWall.prototype.after_activate = function(player){}
 //----------
 // CrossLine
 //----------
-Object.CrossLine = function(x, y){ Object.call(this, x, y); }
+Object.CrossLine = function(x, y, game){ Object.call(this, x, y, game); }
 Object.CrossLine.inherits(new Object(0, 0));
+Object.CrossLine.name = "CrossLine";
 
 Object.CrossLine.prototype.before_activate = function(player){}
 Object.CrossLine.prototype.after_activate = function(player){}
@@ -209,8 +213,9 @@ Object.CrossLine.prototype.after_activate = function(player){}
 //----------
 // Immunity
 //----------
-Object.Immunity = function(x, y){ Object.call(this, x, y); }
+Object.Immunity = function(x, y, game){ Object.call(this, x, y, game); }
 Object.Immunity.inherits(new Object(0, 0));
+Object.Immunity.name = "Immunity";
 
 Object.Immunity.prototype.before_activate = function(player){}
 Object.Immunity.prototype.after_activate = function(player){}
