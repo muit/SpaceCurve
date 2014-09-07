@@ -20,6 +20,11 @@ Config = {
         width: 400,
     },
 
+    Game: {
+        maxPlayers: 6,
+        waitTime: 5000
+    },
+
     Player: {
         speed: 3,
         radius: 2,
