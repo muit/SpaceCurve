@@ -35,7 +35,7 @@ var source = {
   yml   : [ 'source/organisms/*.yml']};
 
 var banner = ['/**',
-  ' * <%= pkg.name %> - <%= pkg.description %>',
+  ' * '+pkg.name+" - "+pkg.description,
   ' * @version v<%= pkg.version %>',
   ' * @link    <%= pkg.homepage %>',
   ' * @author  <%= pkg.author.name %> (<%= pkg.author.site %>)',
@@ -59,7 +59,6 @@ gulp.task('coffee', function() {
     .pipe(concat('atoms.' + pkg.name + '.coffee'))
     .pipe(coffee().on('error', gutil.log))
     .pipe(uglify({mangle: false}))
-    .pipe(header(banner, {pkg: pkg}))
     .pipe(gulp.dest(path.build + '/js'))
     .pipe(connect.reload());
 });
@@ -68,7 +67,6 @@ gulp.task('styl', function() {
   gulp.src(source.styl)
     .pipe(concat('atoms.' + pkg.name + '.styl'))
     .pipe(stylus({compress: true, errors: true}))
-    .pipe(header(banner, {pkg: pkg}))
     .pipe(gulp.dest(path.build + '/css'))
     .pipe(connect.reload());
 });
@@ -82,7 +80,7 @@ gulp.task('yml', function() {
 });
 
 gulp.task('webserver', function() {
-  connect.server({ port: 8000, root: 'public/', livereload: true });
+  connect.server({ port: 3000, root: 'public/', livereload: true });
 });
 
 gulp.task('init', function() {
