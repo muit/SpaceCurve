@@ -6,13 +6,14 @@
       font-weight: FONT_WEIGHT_NORMAL
 
   [data-atoms=app] [data-organism-section] &
-    border-radius: BORDER_RADIUS
-    background-color: BUTTON
     color: darken(BUTTON, 50%)
     > abbr
       font-weight: FONT_WEIGHT_NORMAL
 
-    &:not([disabled])
+    &:not(.transparent)
+      background-color: BUTTON
+      border-radius: BORDER_RADIUS
+    &:not([disabled]):not(.transparent)
       transition: opacity 0.25s ease, background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease
 
       PERCENT = 30%
@@ -72,4 +73,3 @@
       background-color: lighten(WARNING, PERCENT)
     &.theme:hover
       background-color: lighten(THEME, PERCENT)
-

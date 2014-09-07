@@ -4,14 +4,25 @@ children:
         - Atom.Heading:
             size: h1
             value: Space Curve
-  - Organism.Section:
-      children:
         - Molecule.Navigation:
             children:
               - Atom.Button:
                   events:
                     - touch
-                  path: game/canvas
-                  text: "Play!"
+                  icon: network
+                  path: game_list/content
+            style: right
+        - Molecule.Navigation:
+            children:
+              - Atom.Button:
+                  icon: up-arrow
+                  path: login
+            style: left
+  - Organism.Section:
+      children:
+        - Molecule.List:
+            children:
+              - Atom.Li:
+                  text: "Version 0.0: Whats new?"
       id: menu
 id: main

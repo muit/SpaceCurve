@@ -1,0 +1,20 @@
+children:
+  - Organism.Header:
+      children:
+        - Atom.Heading:
+            size: h1
+            value: Puntuation
+  - Organism.Section:
+      children:
+        - Molecule.List:
+            children:
+              - Atom.Li:
+                  text: Player_name
+                  id: game_player
+                  style: left
+              - Atom.Li:
+                  id: player_points
+                  text: "10"
+      id: info_content
+method: prepend
+id: info

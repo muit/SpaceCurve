@@ -13,6 +13,14 @@ children:
                   icon: back
                   path: back
             style: right
+        - Molecule.Navigation:
+            children:
+              - Atom.Button:
+                  events:
+                    - touch
+                  icon: menu
+                  path: info
+            style: left
   - Organism.Section:
       children: []
       id: canvas

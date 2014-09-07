@@ -35,7 +35,7 @@ var source = {
   yml   : [ 'source/organisms/*.yml']};
 
 var banner = ['/**',
-  ' * '+pkg.name+" - "+pkg.description,
+  ' * <%= pkg.name %> - <%= pkg.description %>',
   ' * @version v<%= pkg.version %>',
   ' * @link    <%= pkg.homepage %>',
   ' * @author  <%= pkg.author.name %> (<%= pkg.author.site %>)',

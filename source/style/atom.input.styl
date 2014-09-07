@@ -1,7 +1,8 @@
 [data-atoms=app]
   [data-atom-input]:not([type=range]):not([data-atom-input=autocomplete]), [data-atom-input=autocomplete] > input, [data-atom-select], [data-atom-textarea]
-    padding: (UNIT / 2)
-    margin-bottom: (UNIT / 4)
+    padding-top: (FORM_SIZE / 2)
+    padding-bottom: (FORM_SIZE / 2)
+    margin-bottom: (FORM_SIZE / 4)
     font-family: FONT_FAMILY
     font-size: FONT_SIZE_NORMAL
     font-weight: FONT_WEIGHT_NORMAL
@@ -54,7 +55,6 @@
       &::-webkit-slider-thumb
         background-color: THEME
         border-color: THEME
-
 
 @media screen and (min-width: 1024px)
   [data-atoms="app"] input[type=range]:hover
