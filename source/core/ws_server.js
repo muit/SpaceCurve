@@ -18,9 +18,6 @@ var WsServer = function(port)
     console.log('WSServer: Running at port: ' + port);
     this.io.total = 0;
     this.io.on('connection', function(socket){ self.newPlayer(socket); });
-
-    console.log("WSServer: Started game Bucle.");
-    this.update();
 }
 
 //*******************************
@@ -87,9 +84,10 @@ WsServer.prototype.newGame = function(name){
 // Game class
 // Each instance is a diferent game.
 //*******************************
-Game = function(name){
+var Game = function(name){
     this.name = name;
     this.done = false;
+    console.log("WSServer: Created new game '"+name+"'");
 }
 Game.prototype.events = new EventMap();
 
@@ -173,7 +171,7 @@ Game.prototype.update = function(){
     }
 }
 
-Game.prototype.emitPlayers = function(opcode, data)){
+Game.prototype.emitPlayers = function(opcode, data){
     this.players.forEach(function(player){
         player.socket.emit(opcode, data);
     });
