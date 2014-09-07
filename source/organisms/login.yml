@@ -16,7 +16,7 @@ children:
               - Atom.Label:
                   value: "Password:"
               - Atom.Input:
-                  type: text
+                  type: password
                   name: password
               - Atom.Button:
                   text: Log In
