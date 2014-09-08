@@ -25,11 +25,11 @@ var WsServer = function(port)
 // The method especified need to exists in WsServer.prototype
 // opcode - callback
 //*******************************
-WsServer.packets = {
-    direction: "setDirection",
-    disconect: "disconect",
-    games: "getGames",
-};
+WsServer.packets = [
+    {opcode: "direction", method: "setDirection"},
+    {opcode: "disconect", method: "disconect"   },
+    {opcode: "games",     method: "getGames"    },
+];
 
 WsServer.prototype.players = [];
 WsServer.prototype.newPlayer = function(socket)
@@ -39,27 +39,36 @@ WsServer.prototype.newPlayer = function(socket)
 
     socket.on("login", function(name, password){
         if(self.players.getByName(name) == undefined){
-            console.log("          "+name+" logged in succesfully.");
+            console.log("WSServer: '"+name+"' logged in succesfully.");
             socket.emit("login", {error: false, msg: "Logged in succesfully."});
 
             var player = new Player(name, socket, 0, 0, 0);
             self.players.push(player);
 
             //Create Events for all packets
-            for(var opcode in WsServer.packets)
-            {
-                //Get function name from opcode
-                var callback = self[WsServer.packets[opcode]];
-                
+            WsServer.packets.forEach(function(packet)
+            {   
                 //Create Event
-                socket.on(opcode, function(data){
-                    callback(player, data);
+                socket.on(packet.opcode, function(data){
+                    self[packet.method](player, data);
                 });
-            }
+            });
+            socket.on('logout', function(args){
+                if(player.game) player.game.kickPlayer(player);
+                self.players.remove(player);
+                console.log("WSServer: '"+player.name+"' logged out succesfully.");
+            });
+
+            socket.on('disconnect', function(){
+                if(player.game) player.game.kickPlayer(player);
+                var removedPlayer = self.players.remove(player);
+                if(removedPlayer != undefined)
+                    console.log("WSServer: '"+player.name+"' lost connection.");
+            });
         }
         else
         {
-            console.log("          "+name+" couldn't log in.");
+            console.log("WSServer: '"+name+"' couldn't login.");
             socket.emit("login", {error: true, msg: "Could not login. That name is occuped."});
         }
     });
@@ -89,7 +98,7 @@ WsServer.prototype.disconect = function(player, data){
     this.players.remove(player);
 }
 
-WsServer.prototype.getGames = function(player /*,data*/){
+WsServer.prototype.getGames = function(player, data){
     var games = [];
     this.games.forEach(function(game){
         games.push({
@@ -98,7 +107,7 @@ WsServer.prototype.getGames = function(player /*,data*/){
             playing: game.started
         });
     });
-
+    console.log("Games request from "+player.name);
     player.socket.emit("games", {games: games});
 }
 
