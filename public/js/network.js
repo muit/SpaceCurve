@@ -1,22 +1,34 @@
 document.host=document.URL.split("/")[2].split(":")[0];
 
 Network = function(port){
+    this.logged = false;
     this.socket = io.connect(document.host+":"+port, {secure: true});
 }
 Network.prototype.login = function(name, password, success, error){
-    var self = this;
-
-    this.socket.on("login", function(res){
-        self.socket.removeAllListeners('login');
-        if(!res.error) 
-            success(res.msg);
-        else if(error != undefined) 
-            error(res.msg);
-    });
-    this.socket.emit("login", name, password);
+    if(!this.logged){
+        var self = this;
+        this.socket.on("login", function(res){
+            if(!res.error){
+                self.logged = true;
+                if(success != undefined) success(res.msg);
+            }
+            else {
+                self.logged = false; 
+                if(error != undefined) error(res.msg);
+            }
+        });
+        this.socket.emit("login", name, password);
+    }
 }
 Network.prototype.signup = function(name, email, password){
     //Not yet
+}
+
+Network.prototype.logout = function(){
+    if(this.logged){
+        this.socket.emit("logout", {});
+        this.logged = false;
+    }
 }
 
 Network.prototype.onInfo = function(players, objects){
@@ -27,9 +39,9 @@ Network.prototype.onInfo = function(players, objects){
 }
 
 Network.prototype.getGames = function(games){
-    this.socket.emit("games");
+    this.socket.emit("games", {});
     this.socket.on("games", function(data){
-        self.socket.removeAllListeners("games");
-        games(data.games);
+        console.log("Games received from server");
+        games(data);
     });
 }
