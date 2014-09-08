@@ -100,14 +100,15 @@ WsServer.prototype.disconect = function(player, data){
 
 WsServer.prototype.getGames = function(player, data){
     var games = [];
-    this.games.forEach(function(game){
+    this.games.forEach(function(game, index){
         games.push({
+            id: index,
             name: game.name, 
             playerAmount: game.players.length+"/".Config.Game.maxPlayers,
             playing: game.started
         });
     });
-    console.log("Games request from "+player.name);
+    console.log("WSServer: Games request from "+player.name);
     player.socket.emit("games", {games: games});
 }
 

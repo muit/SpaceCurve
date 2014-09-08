@@ -2,7 +2,22 @@ class Atoms.Organism.Game_list extends Atoms.Organism.Article
 
   @scaffold "assets/scaffold/game_list.json"
 
+  render: ->
+    super
+    network.getGames @load
+  
+  load: (data)->
+    __.Entity.GameItem.destroyAll()
+    if data.error == false
+      for game in data.games
+        __.Entity.GameItem.create({
+          id: game.id,
+          name: game.name,
+          players: game.playerAmount,
+          status: (game.playing)? "Playing" : "Waiting",
+        })
 
+  
   # -- Children bubble events --------------------------------------------------
   onButtonTouch: (event, dispatcher, hierarchy...) ->
     # Your code...
