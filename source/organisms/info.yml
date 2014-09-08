@@ -7,14 +7,14 @@ children:
   - Organism.Section:
       children:
         - Molecule.List:
-            children:
-              - Atom.Li:
-                  text: Player_name
-                  id: game_player
-                  style: left
-              - Atom.Li:
-                  id: player_points
-                  text: "10"
+            children: []
+            id: playerlist
+            bind:
+              entity: __.Entity.Player
+              atom: Atom.Li
+              create: true
+              update: true
+              destroy: true
       id: info_content
 method: prepend
 id: info

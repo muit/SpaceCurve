@@ -9,18 +9,21 @@ children:
         - Molecule.Form:
             children:
               - Atom.Label:
-                  value: "Username/email:"
+                  value: "Username:"
               - Atom.Input:
                   type: text
                   name: username
               - Atom.Label:
                   value: "Password:"
               - Atom.Input:
-                  type: password
+                  type: text
                   name: password
               - Atom.Button:
+                  events:
+                    - touch
                   text: Log In
                   path: back
+                  style: fluid
       id: content
 id: login
 method: prepend

@@ -72,7 +72,6 @@ gulp.task('styl', function() {
 });
 
 gulp.task('yml', function() {
-  console.log(source.yml)
   gulp.src(source.yml)
     .pipe(yml().on('error', gutil.log))
     .pipe(gulp.dest(path.build + '/scaffold'))

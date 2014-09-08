@@ -7,7 +7,4 @@ class Atoms.Organism.Game_list extends Atoms.Organism.Article
   onButtonTouch: (event, dispatcher, hierarchy...) ->
     # Your code...
 
-  game/canvas: (event, dispatcher, hierarchy...) ->
-    # Your code...
-
 new Atoms.Organism.Game_list()

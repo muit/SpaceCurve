@@ -3,8 +3,8 @@ children:
       children:
         - Atom.Heading:
             size: h1
-            value: User Name
-            id: user_name
+            value: Game Name
+            id: game_name
         - Molecule.Navigation:
             children:
               - Atom.Button:

@@ -10,19 +10,27 @@ children:
                   events:
                     - touch
                   icon: network
-                  path: game_list/content
+                  path: game_list/games
             style: right
         - Molecule.Navigation:
             children:
               - Atom.Button:
+                  events:
+                    - touch
                   icon: up-arrow
                   path: login
             style: left
   - Organism.Section:
       children:
         - Molecule.List:
-            children:
-              - Atom.Li:
-                  text: "Version 0.0: Whats new?"
-      id: menu
+            children: []
+            id: newslist
+            bind:
+              entity: __.Entity.New
+              atom: Atom.Li
+              create: true
+              update: true
+              destroy: true
+      id: news
+      style: padding
 id: main
