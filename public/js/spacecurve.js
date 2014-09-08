@@ -35,7 +35,8 @@ function Game(){
     this.renderer.setClearColor(0x555555);
     this.renderer.setSize(window.innerWidth, window.innerHeight);
 
-    $("#canvas").append(this.renderer.domElement);
+    var canvas = document.getElementById("canvas")
+    if(canvas) canvas.innerHTML(this.renderer.domElement);
 };
 
 Game.prototype.start = function(){
