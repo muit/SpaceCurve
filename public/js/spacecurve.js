@@ -8,8 +8,8 @@ SC = {
     require: function(moduleName){
         if (typeof moduleName == "string") {
             moduleName = String(moduleName).toLowerCase();
-            if (moduleName in modules) {
-                return modules[moduleName];                
+            if (moduleName in this.modules) {
+                return this.modules[moduleName];                
             }
             throw new Error("SGF.require: module name '" + moduleName + "' does not exist");
         }
@@ -18,9 +18,8 @@ SC = {
     log: function(text){
         console.log(text);
     },
+    modules: {},
 }
-
-modules = {};
 
 /** section: Game API
  * class Component
@@ -77,8 +76,8 @@ Game.Component = function(x, y){
 
     this.position = new Vector2(x,y);
 }
-Component.prototype.position = new Vector2(0,0);
-Component.prototype.setPosition = function(x, y){
+Game.Component.prototype.position = new Vector2(0,0);
+Game.Component.prototype.setPosition = function(x, y){
     this.position = new Vector2(x, y);
 }
 
@@ -90,7 +89,7 @@ Game.Entity = function(color){
 }
 Game.Entity.inherits(new Game.Component(0,0));
 
-Game.Entity.setColor = function(color){
+Game.Entity.prototype.setColor = function(color){
     if(color == "random")
         this.color = new RGB(Math.randomRange(0,255),Math.randomRange(0,255),Math.randomRange(0,255));
     else if(color instanceof RGB || color instanceof RGBA)
@@ -138,7 +137,7 @@ Game.Object.Immunity = function(){}
 Game.Object.Immunity.inherits(Game.Object);
 Game.Object.Immunity.icon = "img/object_immunity.png";
 
-modules["game"] = Game;
+SC.modules["game"] = Game;
 
 Input = function(game){
 
@@ -182,18 +181,53 @@ Input.release = function() {
             ['stopObserving']("contextmenu", contextmenuHandler);
     Input.grabbed = false;
 }
-modules["input"] = Input;
+SC.modules["input"] = Input;
 
 
-
-
-//****************************
-// Util Methods
-//****************************
-Function.prototype.inherits = function(superClass){
-    if(typeof superClass == "function")
-        this.prototype = new superClass();
-    else
-        this.prototype = superClass;
-    this.prototype.constructor = this;
+Network = function(port){
+    this.logged = false;
+    this.socket = io.connect(document.host+":"+port, {secure: true});
 }
+Network.prototype.login = function(name, password, success, error){
+    if(!this.logged){
+        var self = this;
+        this.socket.on("login", function(res){
+            if(!res.error){
+                self.logged = true;
+                if(success != undefined) success(res.msg);
+            }
+            else {
+                self.logged = false; 
+                if(error != undefined) error(res.msg);
+            }
+        });
+        this.socket.emit("login", name, password);
+    }
+}
+Network.prototype.signup = function(name, email, password){
+    //Not yet
+}
+
+Network.prototype.logout = function(){
+    if(this.logged){
+        this.socket.emit("logout", {});
+        this.logged = false;
+    }
+}
+
+Network.prototype.onInfo = function(players, objects){
+    this.socket.on("info", function(data){ 
+        players(data.players);
+        objects(data.objects);
+    });
+}
+
+Network.prototype.getGames = function(games){
+    this.socket.emit("games", {});
+    this.socket.on("games", function(data){
+        console.log("Games received from server");
+        games(data);
+    });
+}
+
+SC.modules["network"] = Network;

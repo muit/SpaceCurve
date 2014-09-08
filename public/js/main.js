@@ -1,4 +1,6 @@
 $(function(){
-    game = new Game();
-    network = new Network(14494);
+    var gameAPI = SC.require("game");
+    var networkAPI = SC.require("network");
+    game = new gameAPI();
+    network = new networkAPI(14494);
 });
