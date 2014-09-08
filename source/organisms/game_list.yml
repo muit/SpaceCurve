@@ -13,21 +13,30 @@ children:
                   path: back
             style: right
         - Molecule.Navigation:
+            events:
+              - select
+            callbacks:
+              - onRandomGame
             children:
               - Atom.Button:
                   events:
                     - touch
                   icon: share
-                  path: game/canvas
             style: left
   - Organism.Section:
       children:
         - Molecule.List:
             children: []
             id: gamelist
+            events:
+              - select
+            callbacks:
+              - onGameItem
             bind:
               entity: __.Entity.GameItem
               atom: Atom.Li
+              events:
+                - touch
               create: true
               update: true
               destroy: true

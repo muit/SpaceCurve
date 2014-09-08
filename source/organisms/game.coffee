@@ -4,7 +4,8 @@ class Atoms.Organism.Game extends Atoms.Organism.Article
 
 
   # -- Children bubble events --------------------------------------------------
-  onButtonTouch: (event, dispatcher, hierarchy...) ->
-    # Your code...
+
+  show: (@entity) ->
+    Atoms.Url.path "game/canvas"
 
 new Atoms.Organism.Game()
