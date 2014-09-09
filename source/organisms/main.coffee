@@ -2,9 +2,10 @@ class Atoms.Organism.Main extends Atoms.Organism.Article
 
   @scaffold "assets/scaffold/main.json"
 
-
-  # -- Children bubble events --------------------------------------------------
-  onButtonTouch: (event, dispatcher, hierarchy...) ->
-    # Your code...
+  onGameList: (event, dispatcher, hierarchy...) ->
+    if(network.logged)
+      Atoms.Url.path "game_list/games"
+    else
+      console.log "You need to be logged to play!"
 
 new Atoms.Organism.Main()

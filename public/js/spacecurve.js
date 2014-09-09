@@ -283,22 +283,6 @@ Network.prototype.joinGame = function(id, callback){
     this.socket.emit("joingame", {id: id});
 }
 
-Network.prototype.exitGame = function(callback){
-    if(!this.isConnected()){
-        callback({error: true, msg: "Not connected to server."});
-        return;
-    }
-    var self = this;
-    this.socket.on("exitgame", function(data){
-        self.socket.removeAllListeners("exitgame");
-
-        console.log(data.msg);
-        if(data.error == undefined) data.error = true;
-        callback(data);
-    });
-    this.socket.emit("exitgame", {id: id});
-}
-
 Network.prototype.createGame = function(name, callback){
     if(!this.isConnected()){
         callback({error: true, msg: "Not connected to server."});
@@ -313,6 +297,22 @@ Network.prototype.createGame = function(name, callback){
         callback(data);
     });
     this.socket.emit("creategame", {name: name});
+}
+
+Network.prototype.exitGame = function(callback){
+    if(!this.isConnected()){
+        callback({error: true, msg: "Not connected to server."});
+        return;
+    }
+    var self = this;
+    this.socket.on("exitgame", function(data){
+        self.socket.removeAllListeners("exitgame");
+
+        console.log(data.msg);
+        if(data.error == undefined) data.error = true;
+        callback(data);
+    });
+    this.socket.emit("exitgame", {});
 }
 
 SC.modules["network"] = Network;

@@ -5,12 +5,15 @@ children:
             size: h1
             value: Space Curve
         - Molecule.Navigation:
+            events:
+              - select
+            callbacks:
+              - onGameList
             children:
               - Atom.Button:
                   events:
                     - touch
                   icon: network
-                  path: game_list/games
             style: right
         - Molecule.Navigation:
             children:

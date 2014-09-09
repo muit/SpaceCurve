@@ -29,7 +29,6 @@ class Atoms.Organism.Game_list extends Atoms.Organism.Article
     # Your code...
 
   onGameItem: (atom, dispatcher, hierarchy...) ->
-    atom.el.css "opacity", "0.5"
     __.Article.Game.join atom.entity
 
   onRandomGame: (atom, dispatcher, hierarchy...) ->

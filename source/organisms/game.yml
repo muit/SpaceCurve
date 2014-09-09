@@ -6,12 +6,15 @@ children:
             value: Game Name
             id: game_name
         - Molecule.Navigation:
+            events:
+              - select
+            callbacks:
+              - onExitGame
             children:
               - Atom.Button:
                   events:
                     - touch
                   icon: back
-                  path: back
             style: right
         - Molecule.Navigation:
             children:

@@ -117,10 +117,15 @@ WsServer.prototype.getGames = function(player, data){
 
 WsServer.prototype.joinGame = function(player, data){
     var game = this.games[data.id];
-    game.addPlayer(player);
+    if(game){
+        game.addPlayer(player);
 
-    console.log(player.name+" joined game "+game.name);
-    player.socket.emit("joingame", {error: false, msg: "Joined game "+game.name});
+        console.log("WSServer: '"+player.name+"' joined game "+game.name);
+        player.socket.emit("joingame", {error: false, msg: "Joined game "+game.name});
+    }
+    else{
+        player.socket.emit("joingame", {error: true, msg: "That game does not exists!"});
+    }
 }
 
 WsServer.prototype.createGame = function(player, data){
@@ -140,10 +145,11 @@ WsServer.prototype.createGame = function(player, data){
 
 WsServer.prototype.exitGame = function(player, data){
     if(player.inGame){
+
+        console.log("WSServer: "+player.name+" exited "+data.name);
         player.game.kickPlayer(player);
         player.game = null;
 
-        console.log("WSServer: "+player.name+" exited "+data.name);
         player.socket.emit("exitgame", {error: false, msg: ""});
     }
     else{
@@ -218,6 +224,7 @@ Game.prototype.kickPlayer = function(player){
     this.players.remove(player);
 
     if(this.players.length <= 0){
+        console.log("Not enought players. Game "+this.name+" will be closed.");
         websocketServer.removeGame(this);
     }
     else if(this.moderator == player){

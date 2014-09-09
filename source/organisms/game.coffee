@@ -18,5 +18,9 @@ class Atoms.Organism.Game extends Atoms.Organism.Article
         Atoms.Url.path "game/canvas"
       else
         #error message data.msg
-
+  onExitGame:  (atom, dispatcher, hierarchy...) ->
+    network.exitGame (data) ->
+      console.log(data.msg)
+      Atoms.Url.path "game_list/games"
+    
 new Atoms.Organism.Game()
