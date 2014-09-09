@@ -2,6 +2,9 @@ class Atoms.Organism.Game extends Atoms.Organism.Article
 
   @scaffold "assets/scaffold/game.json"
 
+  render: ->
+    super
+    window.game = new gameAPI()
 
   # -- Children bubble events --------------------------------------------------
 

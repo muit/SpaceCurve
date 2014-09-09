@@ -27,4 +27,5 @@ children:
   - Organism.Section:
       children: []
       id: canvas
+      style: align center
 id: game

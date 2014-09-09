@@ -29,15 +29,24 @@ SC = {
  * @constructor
  **/
 function Game(){
+    var canvas = document.getElementById("canvas");
+    if(!canvas)
+        throw new Error("Canvas element does not exist.");
+
+    if(canvas.clientHeight < canvas.clientWidth)
+        var side = canvas.clientHeight;
+    else
+        var side = canvas.clientWidth;
+
     this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(45, window.innerWidth, window.innerHeight, 0.1, 1000);
+    this.camera = new THREE.PerspectiveCamera(45, side, side, 0.1, 1000);
     this.renderer = new THREE.WebGLRenderer();
 
     this.renderer.setClearColor(0x555555);
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
 
-    var canvas = document.getElementById("canvas")
-    if(canvas) canvas.innerHTML(this.renderer.domElement);
+    this.renderer.setSize(side, side);
+
+    canvas.appendChild(this.renderer.domElement);
 };
 
 Game.prototype.start = function(){
@@ -61,12 +70,17 @@ Game.prototype.bucle = function(){
         requestAnimationFrame(this.bucle);
     }
 }
+Game.prototype.add = function(element){
+    if(!element.gl) 
+        throw new Error("Element don't have gl module.");
+    this.scenene.add(element.gl);
+}
 Game.prototype.render = function(){
     this.renderer.render(this.scene, this.camera); 
 }
 
 Game.prototype.update = function(){
-    //Nothing to do :D
+    //Nothing to do Yei! :D
 }
 
 //*************************************************************************
