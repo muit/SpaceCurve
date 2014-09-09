@@ -23,6 +23,17 @@ children:
                     - touch
                   icon: share
             style: left
+        - Molecule.Navigation:
+            events:
+              - select
+            callbacks:
+              - onCreateGame
+            children:
+              - Atom.Button:
+                  events:
+                    - touch
+                  icon: plus
+            style: left
   - Organism.Section:
       children:
         - Molecule.List:

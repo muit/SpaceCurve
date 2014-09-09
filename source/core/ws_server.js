@@ -31,6 +31,7 @@ WsServer.packets = [
     {opcode: "games",      method: "getGames"    },
     {opcode: "joingame",   method: "joinGame"    },
     {opcode: "creategame", method: "createGame"  },
+    {opcode: "exitgame",   method: "exitGame"    },
 ];
 
 WsServer.prototype.players = [];
@@ -106,12 +107,12 @@ WsServer.prototype.getGames = function(player, data){
         games.push({
             id: index,
             name: game.name, 
-            playerAmount: game.players.length+"/".Config.Game.maxPlayers,
+            playerAmount: game.players.length+"/"+Config.Game.maxPlayers,
             playing: game.started
         });
     });
     console.log("WSServer: Games request from "+player.name);
-    player.socket.emit("games", {games: games});
+    player.socket.emit("games", {error: false, games: games});
 }
 
 WsServer.prototype.joinGame = function(player, data){
@@ -119,7 +120,7 @@ WsServer.prototype.joinGame = function(player, data){
     game.addPlayer(player);
 
     console.log(player.name+" joined game "+game.name);
-    player.socket.emit("joingame", {error: false, msg: games});
+    player.socket.emit("joingame", {error: false, msg: "Joined game "+game.name});
 }
 
 WsServer.prototype.createGame = function(player, data){
@@ -134,6 +135,19 @@ WsServer.prototype.createGame = function(player, data){
     }
     else{
         player.socket.emit("creategame", {error: true, msg: "Game name need 4 letters or more."});
+    }
+}
+
+WsServer.prototype.exitGame = function(player, data){
+    if(player.inGame){
+        player.game.kickPlayer(player);
+        player.game = null;
+
+        console.log("WSServer: "+player.name+" exited "+data.name);
+        player.socket.emit("exitgame", {error: false, msg: ""});
+    }
+    else{
+        player.socket.emit("exitgame", {error: true, msg: "You are not in a game."});
     }
 }
 
@@ -183,11 +197,11 @@ Game.prototype.players = [];
 Game.prototype.moderator = undefined;
 Game.prototype.addPlayer = function(player){
     if(!player.inGame){
-        if(players.length < Config.Game.maxPlayers){
+        if(this.players.length < Config.Game.maxPlayers){
             player.inGame = true;
             player.game = this;
 
-            if(players.length == 0) 
+            if(this.players.length == 0) 
                 this.moderator = player;
             this.players.push(player);
             return true;
@@ -203,11 +217,12 @@ Game.prototype.kickPlayer = function(player){
     player.game = null;
     this.players.remove(player);
 
-    if(this.moderator == player) 
-        this.moderator = this.players.first();
-
-    if(this.players.length <= 0)
+    if(this.players.length <= 0){
         websocketServer.removeGame(this);
+    }
+    else if(this.moderator == player){
+        this.moderator = this.players.first();
+    }
 }
 
 Game.prototype.objects = [];
@@ -290,7 +305,7 @@ var Player = function(name, socket, x, y, rad, game){
 }
 Player.inherits(new Component(0,0));
 
-player.prototype.isModerator = function(){
+Player.prototype.isModerator = function(){
     if(this.game == undefined)
         return false;
     return this.game.moderator == this;
