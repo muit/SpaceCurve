@@ -8,7 +8,7 @@ ws = require("../source/core/ws_server.js");
 // Only server the html & other files
 //*******************************
 
-//httpServer = http.start(3000, {debug: true, secure: false});
+httpServer = http.start(3000, {debug: true, secure: false});
 
 //*******************************
 // SOCKET SERVER
