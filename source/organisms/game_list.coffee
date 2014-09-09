@@ -2,20 +2,24 @@ class Atoms.Organism.Game_list extends Atoms.Organism.Article
 
   @scaffold "assets/scaffold/game_list.json"
 
-  render: ->
+  constructor: ->
     super
-    network.getGames @load
+    @bind "show", @load
+
   
-  load: (data)->
+  load: ->
     __.Entity.GameItem.destroyAll()
-    if data.error == false
-      for game in data.games
-        __.Entity.GameItem.create({
-          id: game.id,
-          name: game.name,
-          players: game.playerAmount,
-          status: (game.playing)? "Playing" : "Waiting",
-        })
+    network.getGames (data) ->
+      if data.error == false
+        for game in data.games
+          __.Entity.GameItem.create({
+            id: game.id,
+            name: game.name,
+            players: game.playerAmount,
+            status: (game.playing)? "Playing" : "Waiting",
+          })
+      else
+        console.log data.msg
 
   
   # -- Children bubble events --------------------------------------------------
