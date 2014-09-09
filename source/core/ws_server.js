@@ -26,9 +26,11 @@ var WsServer = function(port)
 // opcode - callback
 //*******************************
 WsServer.packets = [
-    {opcode: "direction", method: "setDirection"},
-    {opcode: "disconect", method: "disconect"   },
-    {opcode: "games",     method: "getGames"    },
+    {opcode: "direction",  method: "setDirection"},
+    {opcode: "disconect",  method: "disconect"   },
+    {opcode: "games",      method: "getGames"    },
+    {opcode: "joingame",   method: "joinGame"    },
+    {opcode: "creategame", method: "createGame"  },
 ];
 
 WsServer.prototype.players = [];
@@ -79,7 +81,7 @@ WsServer.prototype.games = [];
 WsServer.prototype.newGame = function(name, player){
     if(!player.inGame){
         this.games.push(new Game(name));
-        this.games.last.addPlayer(player);
+        this.games.last().addPlayer(player);
     }
 }
 
@@ -112,6 +114,28 @@ WsServer.prototype.getGames = function(player, data){
     player.socket.emit("games", {games: games});
 }
 
+WsServer.prototype.joinGame = function(player, data){
+    var game = this.games[data.id];
+    game.addPlayer(player);
+
+    console.log(player.name+" joined game "+game.name);
+    player.socket.emit("joingame", {error: false, msg: games});
+}
+
+WsServer.prototype.createGame = function(player, data){
+    data.name = data.name.replace(/\s{2,}/g, ' ');
+    if(data.name.length > 4){
+        var game = new Game(data.name);
+        game.addPlayer(player);
+        this.games.push(game);
+
+        console.log("WSServer: Game "+data.name+" created by "+player.name);
+        player.socket.emit("creategame", {error: false, msg: data.name+" created succesfully."});
+    }
+    else{
+        player.socket.emit("creategame", {error: true, msg: "Game name need 4 letters or more."});
+    }
+}
 
 
 //*******************************
@@ -156,21 +180,31 @@ Game.prototype.endRound = function(){
 }
 
 Game.prototype.players = [];
+Game.prototype.moderator = undefined;
 Game.prototype.addPlayer = function(player){
-    if(players.length < Config.Game.maxPlayers){
-        if(!player.inGame){
+    if(!player.inGame){
+        if(players.length < Config.Game.maxPlayers){
             player.inGame = true;
             player.game = this;
+
+            if(players.length == 0) 
+                this.moderator = player;
             this.players.push(player);
             return true;
         }
     }
     return false;
 }
+Game.prototype.setModerator = function(player){
+    this.moderator = player;
+}
 Game.prototype.kickPlayer = function(player){
     player.inGame = false;
     player.game = null;
     this.players.remove(player);
+
+    if(this.moderator == player) 
+        this.moderator = this.players.first();
 
     if(this.players.length <= 0)
         websocketServer.removeGame(this);
@@ -255,6 +289,12 @@ var Player = function(name, socket, x, y, rad, game){
     this.direction = rad;
 }
 Player.inherits(new Component(0,0));
+
+player.prototype.isModerator = function(){
+    if(this.game == undefined)
+        return false;
+    return this.game.moderator == this;
+}
 
 Player.prototype.update = function(){
     var alpha = this.direction;

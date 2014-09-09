@@ -26,6 +26,7 @@ SC = {
  *
  * An abstract base class for game components. It cannot be instantiated
  * directly, but its subclasses are the building blocks for SGF games.
+ * @constructor
  **/
 function Game(){
     this.scene = new THREE.Scene();
@@ -67,6 +68,7 @@ Game.prototype.render = function(){
 Game.prototype.update = function(){
     //Nothing to do :D
 }
+
 //*************************************************************************
 // Component Class
 // Father of everything
@@ -185,11 +187,27 @@ Input.release = function() {
 SC.modules["input"] = Input;
 
 
+
+/** section: Network API
+ * class Component
+ *
+ * An abstract base class for game components. It cannot be instantiated
+ * directly, but its subclasses are the building blocks for SGF games.
+ * @constructor
+ **/
 Network = function(port){
     this.logged = false;
     this.socket = io.connect(document.host+":"+port, {secure: true});
+    this.socket.on('connect_error', function(err) {
+      console.log("Couldn't connect to server. Retrying...");
+    });
 }
+Network.prototype.isConnected = function(){return network.socket.connected}
 Network.prototype.login = function(name, password, success, error){
+    if(!this.isConnected()){
+        if(error!=undefined) error("Not connected to server.");
+        return;
+    }
     if(!this.logged){
         var self = this;
         this.socket.on("login", function(res){
@@ -205,11 +223,18 @@ Network.prototype.login = function(name, password, success, error){
         this.socket.emit("login", name, password);
     }
 }
-Network.prototype.signup = function(name, email, password){
+Network.prototype.signup = function(name, email, password, success, error){
+    if(!this.isConnected()){
+        if(error!=undefined) error("Not connected to server.");
+        return;
+    }
     //Not yet
 }
 
 Network.prototype.logout = function(){
+    if(!this.isConnected()){
+        console.log("Not connected to server.");
+    }
     if(this.logged){
         this.socket.emit("logout", {});
         this.logged = false;
@@ -224,11 +249,42 @@ Network.prototype.onInfo = function(players, objects){
 }
 
 Network.prototype.getGames = function(games){
-    this.socket.emit("games", {});
+    if(!this.isConnected()){
+        games({error: true, msg: "Not connected to server."});
+        return;
+    }
     this.socket.on("games", function(data){
         console.log("Games received from server");
+        if(data.error == undefined) data.error = true;
         games(data);
     });
+    this.socket.emit("games", {});
+}
+
+Network.prototype.joinGame = function(id, callback){
+    if(!this.isConnected()){
+        callback({error: true, msg: "Not connected to server."});
+        return;
+    }
+    this.socket.on("joingame", function(data){
+        console.log(data.msg);
+        if(data.error == undefined) data.error = true;
+        callback(data);
+    });
+    this.socket.emit("joingame", {id: id});
+}
+
+Network.prototype.createGame = function(name, callback){
+    if(!this.isConnected()){
+        callback({error: true, msg: "Not connected to server."});
+        return;
+    }
+    this.socket.on("creategame", function(data){
+        console.log(data.msg);
+        if(data.error == undefined) data.error = true;
+        callback(data);
+    });
+    this.socket.emit("creategame", {name: name});
 }
 
 SC.modules["network"] = Network;
