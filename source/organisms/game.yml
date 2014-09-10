@@ -15,6 +15,7 @@ children:
                   events:
                     - touch
                   icon: back
+                  path: game_list/games
             style: right
         - Molecule.Navigation:
             children:

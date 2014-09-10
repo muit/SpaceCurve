@@ -11,6 +11,10 @@ class Atoms.Organism.Game extends Atoms.Organism.Article
       else
         @children[0].children[0].el[0].innerHTML = "undefined game"
 
+    @bind "hide", (data)->
+      network.exitGame (data) ->
+        console.log(data.msg)
+
   render: ->
     super
     if(typeof gameAPI == "undefined")
@@ -33,9 +37,6 @@ class Atoms.Organism.Game extends Atoms.Organism.Article
         Atoms.Url.path "game/canvas"
       else
         #error message data.msg
-  onExitGame:  (atom, dispatcher, hierarchy...) ->
-    network.exitGame (data) ->
-      console.log(data.msg)
-      Atoms.Url.path "game_list/games"
+    
     
 new Atoms.Organism.Game()
