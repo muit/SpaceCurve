@@ -2,7 +2,7 @@ function load(){
     if(typeof gameAPI == "undefined")
         gameAPI = SC.require("game");
     networkAPI = SC.require("network");
-    network = new networkAPI(14494);
+    network = new networkAPI(8000);
 }
 
 if(window.addEventListener)
