@@ -44,7 +44,7 @@ function Game(options){
         var side = canvas.clientWidth;
 
     this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(45, side, side, 0.1, 1000);
+    this.camera = new THREE.PerspectiveCamera(45, side/side, 0.1, 1000);
     this.renderer = new THREE.WebGLRenderer();
 
     this.renderer.setClearColor(0x555555);
@@ -74,6 +74,14 @@ function Game(options){
         this.stats = {update: function(){}};
         this.renderstats = {update: function(r){}}
     }
+
+    var geometry = new THREE.BoxGeometry(1,1,1);
+    var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+    this.cube = new THREE.Mesh( geometry, material );
+    this.scene.add( this.cube );
+
+    this.camera.position.z = 5;
+
     var self = this;
     setTimeout(function(){self.start(self);}, 10);
 };
@@ -105,13 +113,15 @@ Game.prototype.render = function(){
 }
 
 Game.prototype.update = function(){
-    //Nothing to do Yei! :D
+    this.cube.rotation.x += 0.01;
+    this.cube.rotation.y += 0.01;
+    this.cube.rotation.z += 0.01;
 }
 
 Game.prototype.add = function(element){
     if(!element.gl) 
         throw new Error("Element don't have gl module.");
-    this.scenene.add(element.gl);
+    this.scenene.add(element.glMesh);
 }
 
 //*************************************************************************

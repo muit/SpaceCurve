@@ -14,7 +14,7 @@ class Atoms.Organism.Login extends Atoms.Organism.Aside
     console.log(msg)
 
   error: (msg)->
-    errorElem = document.querySelector("#login > [data-atom-label], #error")
+    errorElem = @error.el
     errorElem.innerHTML = msg
     errorElem.style.display = "block"
 
