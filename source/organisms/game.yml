@@ -3,7 +3,7 @@ children:
       children:
         - Atom.Heading:
             size: h1
-            value: Game Name
+            value: ""
             id: game_name
         - Molecule.Navigation:
             events:

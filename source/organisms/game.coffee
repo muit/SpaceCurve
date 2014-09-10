@@ -2,6 +2,15 @@ class Atoms.Organism.Game extends Atoms.Organism.Article
 
   @scaffold "assets/scaffold/game.json"
 
+  constructor: ->
+    super
+    @bind "show", (data)->
+      console.log this
+      if(@entity != undefined)
+        @children[0].children[0].el[0].innerHTML = @entity.name
+      else
+        @children[0].children[0].el[0].innerHTML = "undefined game"
+
   render: ->
     super
     if(typeof gameAPI == "undefined")
