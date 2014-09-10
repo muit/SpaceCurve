@@ -43,49 +43,46 @@ WsServer.prototype.newPlayer = function(socket)
     function idValidUsername(name){
         if(name.contains(" ")) return "The username can't have spaces.";
         if(name.length < 4) return "The username needs 4 letters or more.";
-        return ;
+        return true;
     }
 
     socket.on("login", function(name, password){
-        if(self.players.getByName(name) == undefined){
-            var res = idValidUsername(name);
-            if(res != true){
-                socket.emit("login", {error: true, msg: "Could not login. "+res});
-                return;
-            }
-
-            console.log("WSServer: '"+name+"' logged in succesfully.");
-            socket.emit("login", {error: false, msg: "Logged in succesfully."});
-
-            var player = new Player(name, socket, 0, 0, 0);
-            self.players.push(player);
-
-            //Create Events for all packets
-            WsServer.packets.forEach(function(packet)
-            {   
-                //Create Event
-                socket.on(packet.opcode, function(data){
-                    self[packet.method](player, data);
-                });
-            });
-            socket.on('logout', function(args){
-                if(player.game) player.game.kickPlayer(player);
-                self.players.remove(player);
-                console.log("WSServer: '"+player.name+"' logged out succesfully.");
-            });
-
-            socket.on('disconnect', function(){
-                if(player.game) player.game.kickPlayer(player);
-                var removedPlayer = self.players.remove(player);
-                if(removedPlayer != undefined)
-                    console.log("WSServer: '"+player.name+"' lost connection.");
-            });
+        var res = idValidUsername(name);
+        if(res != true){
+            socket.emit("login", {error: true, msg: "Could not login. "+res});
+            return;
         }
-        else
-        {
-            console.log("WSServer: '"+name+"' couldn't login.");
+        if(self.players.getByName(name) != undefined){
             socket.emit("login", {error: true, msg: "Could not login. That name is occuped."});
+            return;
         }
+
+        console.log("WSServer: '"+name+"' logged in succesfully.");
+        socket.emit("login", {error: false, msg: "Logged in succesfully."});
+
+        var player = new Player(name, socket, 0, 0, 0);
+        self.players.push(player);
+
+        //Create Events for all packets
+        WsServer.packets.forEach(function(packet)
+        {   
+            //Create Event
+            socket.on(packet.opcode, function(data){
+                self[packet.method](player, data);
+            });
+        });
+        socket.on('logout', function(args){
+            if(player.game) player.game.kickPlayer(player);
+            self.players.remove(player);
+            console.log("WSServer: '"+player.name+"' logged out succesfully.");
+        });
+
+        socket.on('disconnect', function(){
+            if(player.game) player.game.kickPlayer(player);
+            var removedPlayer = self.players.remove(player);
+            if(removedPlayer != undefined)
+                console.log("WSServer: '"+player.name+"' lost connection.");
+        });
     });
 }
 
