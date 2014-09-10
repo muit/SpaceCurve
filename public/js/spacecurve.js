@@ -34,25 +34,49 @@ function Game(options){
         options.debug = false;
     }
 
+    this.renderer = new THREE.WebGLRenderer();
+    this.scene = new THREE.Scene();
+    this.camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
+
+    this.reload(options);
+    this.loadStats(options);
+
+    var geometry = new THREE.BoxGeometry(1,1,1);
+    var material = new THREE.MeshBasicMaterial( { color: 0xff3300 } );
+    this.cube = new THREE.Mesh( geometry, material );
+    this.scene.add( this.cube );
+
+    this.camera.position.z = 5;
+
+    var self = this;
+    setTimeout(function(){self.start(self);}, 10);
+    window.onresize = function(){
+        self.reload(options);
+    }
+};
+Game.prototype.reload = function(options){
     var canvas = document.getElementById("canvas");
     if(!canvas)
         throw new Error("Canvas element does not exist.");
 
+    canvas.innerHTML = "";
     if(canvas.clientHeight < canvas.clientWidth)
         var side = canvas.clientHeight;
     else
         var side = canvas.clientWidth;
 
-    this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(45, side/side, 0.1, 1000);
-    this.renderer = new THREE.WebGLRenderer();
-
-    this.renderer.setClearColor(0x555555);
-
+    this.renderer.setClearColor(0x777777);
     this.renderer.setSize(side, side);
 
     canvas.appendChild(this.renderer.domElement);
-    
+    this.loadStats(options);
+}
+
+Game.prototype.loadStats = function(options){
+    var canvas = document.getElementById("canvas");
+    if(!canvas)
+        throw new Error("Canvas element does not exist.");
+
     if(options.debug == true){
         //Render stats
         this.renderstats = new THREEx.RendererStats();
@@ -63,10 +87,10 @@ function Game(options){
 
         //FPS stats
         this.stats = new Stats();
-        this.stats.domElement.style.position = 'absolute'
-        this.stats.domElement.style.right    = '0px'
-        this.stats.domElement.style.bottom   = '0px'
-        canvas.appendChild( this.stats.domElement )
+        this.stats.domElement.style.position = 'absolute';
+        this.stats.domElement.style.right    = '0px';
+        this.stats.domElement.style.bottom   = '0px';
+        canvas.appendChild( this.stats.domElement );
 
     }
     else{
@@ -74,17 +98,7 @@ function Game(options){
         this.stats = {update: function(){}};
         this.renderstats = {update: function(r){}}
     }
-
-    var geometry = new THREE.BoxGeometry(1,1,1);
-    var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-    this.cube = new THREE.Mesh( geometry, material );
-    this.scene.add( this.cube );
-
-    this.camera.position.z = 5;
-
-    var self = this;
-    setTimeout(function(){self.start(self);}, 10);
-};
+}
 Game.prototype.start = function(self){
     self.done = false;
     self.bucle();
