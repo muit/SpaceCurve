@@ -6,6 +6,6 @@ class Atoms.Organism.Main extends Atoms.Organism.Article
     if(network.logged)
       Atoms.Url.path "game_list/games"
     else
-      console.log "You need to be logged to play!"
+      @aside "login"
 
 new Atoms.Organism.Main()

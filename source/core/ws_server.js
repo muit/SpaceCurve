@@ -40,8 +40,20 @@ WsServer.prototype.newPlayer = function(socket)
     var self = this;
     console.log("WSServer: New connection.");
 
+    function idValidUsername(name){
+        if(name.contains(" ")) return "The username can't have spaces.";
+        if(name.length < 4) return "The username needs 4 letters or more.";
+        return ;
+    }
+
     socket.on("login", function(name, password){
         if(self.players.getByName(name) == undefined){
+            var res = idValidUsername(name);
+            if(res != true){
+                socket.emit("login", {error: true, msg: "Could not login. "+res});
+                return;
+            }
+
             console.log("WSServer: '"+name+"' logged in succesfully.");
             socket.emit("login", {error: false, msg: "Logged in succesfully."});
 
@@ -141,7 +153,7 @@ WsServer.prototype.createGame = function(player, data){
     data.name = data.name.replace(/\s{2,}/g, ' ');
 
     if(data.name.length <= 4){
-        player.socket.emit("creategame", {error: true, msg: "Game name need 4 letters or more."});
+        player.socket.emit("creategame", {error: true, msg: "Game name needs 4 letters or more."});
         return;
     }
 

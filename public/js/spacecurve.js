@@ -5,6 +5,7 @@
  * the global scope of `SpaceCurve`'s JavaScript environment.
  **/
 SC = {
+    version: "0.3.00",
     require: function(moduleName){
         if (typeof moduleName == "string") {
             moduleName = String(moduleName).toLowerCase();
