@@ -10,7 +10,7 @@ children:
                   events:
                     - touch
                   icon: back
-                  path: back
+                  path: main/news
             style: right
         - Molecule.Navigation:
             events:
