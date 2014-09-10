@@ -4,11 +4,18 @@
   "description": "A game similar than curvefever but in 3d.",
   "contributors": ["Miguel Fernandez <miguel_3c@hotmail.com>"],
   "license": "GPL",
-  "main": "bin/server.js",
-  
+  "main": "./bin/server.js",
+  "bin": {"sccore": "./bin/server.js"},
+  "engines": {"node": ">=0.10.31"},
+
   "repository": {
     "type": "git",
     "url": "https://github.com/muit/SpaceCurve"
+  },
+
+  "bugs": { 
+    "url" : "http://github.com/muit/spacecurve/issues",
+    "email" : "miguel_3c@hotmail.com"
   },
 
   "dependencies": {
