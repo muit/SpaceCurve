@@ -116,6 +116,10 @@ WsServer.prototype.getGames = function(player, data){
 }
 
 WsServer.prototype.joinGame = function(player, data){
+    if(player.inGame){
+        player.socket.emit("joingame", {error: true, msg: "That player is in a game right now. Can't join another."});
+        return;
+    }
     var game = this.games[data.id];
     if(game){
         game.addPlayer(player);
@@ -129,18 +133,24 @@ WsServer.prototype.joinGame = function(player, data){
 }
 
 WsServer.prototype.createGame = function(player, data){
+    if(player.inGame){
+        player.socket.emit("creategame", {error: true, msg: "That player is in a game right now. Can't create another."});
+        return;
+    }
+    
     data.name = data.name.replace(/\s{2,}/g, ' ');
-    if(data.name.length > 4){
-        var game = new Game(data.name);
-        game.addPlayer(player);
-        this.games.push(game);
 
-        console.log("WSServer: Game "+data.name+" created by "+player.name);
-        player.socket.emit("creategame", {error: false, msg: data.name+" created succesfully."});
-    }
-    else{
+    if(data.name.length <= 4){
         player.socket.emit("creategame", {error: true, msg: "Game name need 4 letters or more."});
+        return;
     }
+
+    var game = new Game(data.name);
+    game.addPlayer(player);
+    this.games.push(game);
+
+    console.log("WSServer: Game "+data.name+" created by "+player.name);
+    player.socket.emit("creategame", {error: false, msg: data.name+" created succesfully."});
 }
 
 WsServer.prototype.exitGame = function(player, data){

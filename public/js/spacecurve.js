@@ -28,7 +28,11 @@ SC = {
  * directly, but its subclasses are the building blocks for SGF games.
  * @constructor
  **/
-function Game(){
+function Game(options){
+    if(options == undefined){
+        options.debug = false;
+    }
+
     var canvas = document.getElementById("canvas");
     if(!canvas)
         throw new Error("Canvas element does not exist.");
@@ -47,13 +51,35 @@ function Game(){
     this.renderer.setSize(side, side);
 
     canvas.appendChild(this.renderer.domElement);
+    
+    if(options.debug == true){
+        //Render stats
+        this.renderstats = new THREEx.RendererStats();
+        this.renderstats.domElement.style.position = 'absolute';
+        this.renderstats.domElement.style.left = '0px';
+        this.renderstats.domElement.style.bottom = '0px';
+        canvas.appendChild( this.renderstats.domElement );
+
+        //FPS stats
+        this.stats = new Stats();
+        this.stats.domElement.style.position = 'absolute'
+        this.stats.domElement.style.right    = '0px'
+        this.stats.domElement.style.bottom   = '0px'
+        canvas.appendChild( this.stats.domElement )
+
+    }
+    else{
+        //Fake stats adapters
+        this.stats = {update: function(){}};
+        this.renderstats = {update: function(r){}}
+    }
+    var self = this;
+    setTimeout(function(){self.start(self);}, 10);
 };
-
-Game.prototype.start = function(){
-    this.done = false;
-    this.bucle();
+Game.prototype.start = function(self){
+    self.done = false;
+    self.bucle();
 }
-
 Game.prototype.pause = function(){
     this.done = true;
 }
@@ -65,15 +91,13 @@ Game.prototype.bucle = function(){
     this.update();
     this.render();
 
+    this.stats.update();
+    this.renderstats.update(this.renderer);
     if(!this.done){
         //Need a benchmark (Utyl Timer vs. Three.js frames)
-        requestAnimationFrame(this.bucle);
+        var self = this;
+        requestAnimationFrame(function(){self.bucle();});
     }
-}
-Game.prototype.add = function(element){
-    if(!element.gl) 
-        throw new Error("Element don't have gl module.");
-    this.scenene.add(element.gl);
 }
 Game.prototype.render = function(){
     this.renderer.render(this.scene, this.camera); 
@@ -81,6 +105,12 @@ Game.prototype.render = function(){
 
 Game.prototype.update = function(){
     //Nothing to do Yei! :D
+}
+
+Game.prototype.add = function(element){
+    if(!element.gl) 
+        throw new Error("Element don't have gl module.");
+    this.scenene.add(element.gl);
 }
 
 //*************************************************************************

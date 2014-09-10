@@ -4,7 +4,10 @@ class Atoms.Organism.Game extends Atoms.Organism.Article
 
   render: ->
     super
-    window.game = new gameAPI()
+    if(typeof gameAPI == "undefined")
+      gameAPI = SC.require("game");
+    window.game = new gameAPI({debug: true})
+    window.game.start
 
   # -- Children bubble events --------------------------------------------------
 
