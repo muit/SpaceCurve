@@ -15,4 +15,4 @@ httpServer = http.start(80, {debug: true, secure: false});
 // Makes all the logic
 //*******************************
 
-websocketServer = ws.start(8000);
+websocketServer = ws.start(14494);

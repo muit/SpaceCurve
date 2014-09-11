@@ -130,8 +130,8 @@ Game.prototype.loadStats = function(options){
 Game.prototype.start = function(){
     this.done = false;
 
-    network.onInfo(function(data){
-        console.log(data);
+    network.onInfo(function(players, objects){
+        console.log(players);
     });
 
     this.bucle();
@@ -463,6 +463,7 @@ Network.prototype.startGame = function(callback){
 
     var self = this;
     this.socket.on("startgame", function(data){
+        self.socket.removeAllListeners("startgame");
         if(data.error == undefined) data.error = true;
         callback(data);
     });

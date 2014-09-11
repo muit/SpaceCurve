@@ -171,6 +171,7 @@ WsServer.prototype.createGame = function(player, data){
 }
 
 WsServer.prototype.exitGame = function(player, data){
+    console.log("hey!");
     if(player.inGame){
         player.socket.emit("exitgame", {error: true, msg: "You are not in a game."});
         return;
@@ -253,6 +254,42 @@ Game.prototype.endRound = function(){
     this.waitRound();
 }
 
+//*******************************
+// Periodic Update
+//*******************************
+Game.prototype.update = function(){
+    this.sendData();
+}
+Game.prototype.sendData = function(){
+    if(this.players.length > 0){
+        var playerData = [];
+        this.players.forEach(function(player) {
+            player.update();
+            playerData.push({
+                name: player.name, 
+                x: player.position.x, 
+                y: player.position.y,
+                alive: player.alive,
+                score: player.score
+            });
+        });
+
+        var objectData = [];
+        this.objects.forEach(function(object) {
+            objectData.push({
+                type: object.constructor.name, 
+                x: object.position.x, 
+                y: object.position.y
+            });
+        });
+
+        //Need A LOT of optimization! 
+        this.emit("info", {players: playerData, objects: objectData});
+    }
+}
+
+
+
 Game.prototype.players = [];
 Game.prototype.moderator = undefined;
 Game.prototype.addPlayer = function(player){
@@ -294,37 +331,6 @@ Game.prototype.addObject = function(object){
 Game.prototype.removeObject = function(object){
     object.game = null;
     this.objects.remove(object);
-}
-
-//*******************************
-// Periodic Update
-//*******************************
-Game.prototype.update = function(){
-    if(this.players.length > 0){
-        var playerData = [];
-        this.players.forEach(function(player) {
-            player.update();
-            playerData.push({
-                name: player.name, 
-                x: player.position.x, 
-                y: player.position.y,
-                alive: player.alive,
-                score: player.score
-            });
-        });
-
-        var objectData = [];
-        this.objects.forEach(function(object) {
-            objectData.push({
-                type: object.constructor.name, 
-                x: object.position.x, 
-                y: object.position.y
-            });
-        });
-
-        //Need A LOT of optimization! 
-        this.emit("info", {players: playerData, objects: objectData});
-    }
 }
 
 Game.prototype.emit = function(opcode, data){
