@@ -14,13 +14,19 @@ SC = {
             }
             throw new Error("SGF.require: module name '" + moduleName + "' does not exist");
         }
-        throw new Error("SGF.require: expected argument typeof 'string', got '" + (typeof moduleName) + "'");
+        throw new Error("SGF.require: Expected argument typeof 'string', got '" + (typeof moduleName) + "'");
     },
     log: function(text){
         console.log(text);
     },
     modules: {},
 }
+
+
+
+
+
+
 
 /** section: Game API
  * class Component
@@ -48,8 +54,9 @@ function Game(options){
 
     this.camera.position.z = 5;
 
+    this.loadEvents();
+
     var self = this;
-    setTimeout(function(){self.start(self);}, 10);
     window.onresize = function(){
         self.reload(options);
     }
@@ -71,7 +78,28 @@ Game.prototype.reload = function(options){
     canvas.appendChild(this.renderer.domElement);
     this.loadStats(options);
 }
+Game.prototype.loadEvents = function(){
+    var self = this;
+    network.onGameStatus(function(data){
+        if(data.error){
+            SC.log(data.msg);
+            return;
+        }
+        switch(data.value){
+            case 0:
+            self.pause();
+            break;
 
+            case 1:
+            //Start visual timer with time: data.time
+            break;
+
+            case 2:
+            self.start();
+            break; 
+        }
+    });
+}
 Game.prototype.loadStats = function(options){
     var canvas = document.getElementById("canvas");
     if(!canvas)
@@ -99,9 +127,14 @@ Game.prototype.loadStats = function(options){
         this.renderstats = {update: function(r){}}
     }
 }
-Game.prototype.start = function(self){
-    self.done = false;
-    self.bucle();
+Game.prototype.start = function(){
+    this.done = false;
+
+    network.onInfo(function(data){
+        console.log(data);
+    });
+
+    this.bucle();
 }
 Game.prototype.pause = function(){
     this.done = true;
@@ -127,9 +160,9 @@ Game.prototype.render = function(){
 }
 
 Game.prototype.update = function(){
-    this.cube.rotation.x += 0.01;
-    this.cube.rotation.y += 0.01;
-    this.cube.rotation.z += 0.01;
+    this.cube.rotation.x += 0.03;
+    this.cube.rotation.y += 0.03;
+    this.cube.rotation.z += 0.03;
 }
 
 Game.prototype.add = function(element){
@@ -137,6 +170,12 @@ Game.prototype.add = function(element){
         throw new Error("Element don't have gl module.");
     this.scenene.add(element.glMesh);
 }
+
+
+
+
+
+
 
 //*************************************************************************
 // Component Class
@@ -152,6 +191,7 @@ Game.Component.prototype.position = new Vector2(0,0);
 Game.Component.prototype.setPosition = function(x, y){
     this.position = new Vector2(x, y);
 }
+
 
 //*************************************************************************
 // Entity Class
@@ -179,6 +219,7 @@ Game.IAEntity.inherits(Game.Entity);
 //************************
 Game.Player = function(){ Entity.call(this, "random"); }
 Game.Player.inherits(Game.Entity);
+
 
 //*************************************************************************
 // Object Class
@@ -210,6 +251,20 @@ Game.Object.Immunity.inherits(Game.Object);
 Game.Object.Immunity.icon = "img/object_immunity.png";
 
 SC.modules["game"] = Game;
+
+
+
+
+
+
+
+
+/** section: Input API
+ * Input Class
+ * 
+ * Reads all the player inputs to control the game.
+ * @constructor
+ **/
 
 Input = function(game){
 
@@ -257,11 +312,16 @@ SC.modules["input"] = Input;
 
 
 
+
+
+
+
+
 /** section: Network API
- * class Component
+ * class Network
  *
- * An abstract base class for game components. It cannot be instantiated
- * directly, but its subclasses are the building blocks for SGF games.
+ * Network class controls all the multiplayer events, data sending, and networking.
+ * Each Network instance is a new player in the server.
  * @constructor
  **/
 Network = function(port){
@@ -270,7 +330,7 @@ Network = function(port){
     var self = this;
     this.socket.on('connect_error', function(err) {
         self.logged = false;
-        console.log("Couldn't connect to server. Retrying...");
+        SC.log("Couldn't connect to server. Retrying...");
     });
 }
 Network.prototype.isConnected = function(){return network.socket.connected}
@@ -305,7 +365,7 @@ Network.prototype.signup = function(name, email, password, success, error){
 
 Network.prototype.logout = function(){
     if(!this.isConnected()){
-        console.log("Not connected to server.");
+        SC.log("Not connected to server.");
     }
     if(this.logged){
         this.socket.emit("logout", {});
@@ -314,6 +374,7 @@ Network.prototype.logout = function(){
 }
 
 Network.prototype.onInfo = function(players, objects){
+    this.socket.removeAllListeners("info");
     this.socket.on("info", function(data){
         players(data.players);
         objects(data.objects);
@@ -330,7 +391,7 @@ Network.prototype.getGames = function(games){
     this.socket.on("games", function(data){
         self.socket.removeAllListeners("games");
 
-        console.log("Games received from server");
+        SC.log("Games received from server");
         if(data.error == undefined) data.error = true;
         games(data);
     });
@@ -345,7 +406,7 @@ Network.prototype.joinGame = function(id, callback){
     this.socket.on("joingame", function(data){
         self.socket.removeAllListeners("joingame");
 
-        console.log(data.msg);
+        SC.log(data.msg);
         if(data.error == undefined) data.error = true;
         callback(data);
     });
@@ -361,7 +422,7 @@ Network.prototype.createGame = function(name, callback){
     this.socket.on("creategame", function(data){
         self.socket.removeAllListeners("creategame");
 
-        console.log(data.msg);
+        SC.log(data.msg);
         if(data.error == undefined) data.error = true;
         callback(data);
     });
@@ -377,11 +438,35 @@ Network.prototype.exitGame = function(callback){
     this.socket.on("exitgame", function(data){
         self.socket.removeAllListeners("exitgame");
 
-        console.log(data.msg);
+        SC.log(data.msg);
         if(data.error == undefined) data.error = true;
         callback(data);
     });
     this.socket.emit("exitgame", {});
+}
+
+Network.prototype.onGameStatus = function(callback){
+    var self = this;
+    self.socket.removeAllListeners("gamestatus");
+    self.socket.on("gamestatus", function(data){
+        SC.log("Game State: "+data.value);
+        if(data.error == undefined) data.error = true;
+        callback(data);
+    });
+}
+
+Network.prototype.startGame = function(callback){
+    if(!this.isConnected()){
+        callback({error: true, msg: "Not connected to server."});
+        return;
+    }
+
+    var self = this;
+    this.socket.on("startgame", function(data){
+        if(data.error == undefined) data.error = true;
+        callback(data);
+    });
+    this.socket.emit("startgame", {});
 }
 
 SC.modules["network"] = Network;

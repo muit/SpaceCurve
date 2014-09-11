@@ -32,6 +32,7 @@ WsServer.packets = [
     {opcode: "joingame",   method: "joinGame"    },
     {opcode: "creategame", method: "createGame"  },
     {opcode: "exitgame",   method: "exitGame"    },
+    {opcode: "startgame",   method: "startGame"  },
 ];
 
 WsServer.prototype.players = [];
@@ -99,7 +100,14 @@ WsServer.prototype.removeGame = function(game){
     this.games.remove(game);
 }
 
-//*******************************
+
+
+
+
+
+
+
+//*****************************************************************************
 //Packet Callbacks
 //*******************************
 WsServer.prototype.setDirection = function(player, direction){
@@ -164,17 +172,37 @@ WsServer.prototype.createGame = function(player, data){
 
 WsServer.prototype.exitGame = function(player, data){
     if(player.inGame){
-
-        console.log("WSServer: "+player.name+" exited "+data.name);
-        player.game.kickPlayer(player);
-        player.game = null;
-
-        player.socket.emit("exitgame", {error: false, msg: ""});
-    }
-    else{
         player.socket.emit("exitgame", {error: true, msg: "You are not in a game."});
+        return;
     }
+    console.log("WSServer: "+player.name+" exited "+data.name);
+    player.game.kickPlayer(player);
+    player.game = null;
+
+    player.socket.emit("exitgame", {error: false, msg: ""});
 }
+
+WsServer.prototype.startGame = function(player, data){
+    if(!player.inGame){
+        player.socket.emit("startgame", {error: true, msg: "You are not in a game."});
+        return;
+    }
+    var game = player.game;
+    if(game.moderator == player){
+        game.start();
+        var data = {error: false, msg: "Starting game."}
+    }
+    else
+        var data = {error: true, msg: "You are not the game moderator."}
+
+    player.socket.emit("startgame", data);
+}
+
+
+
+
+
+
 
 
 //*******************************
@@ -185,6 +213,8 @@ var Game = function(name){
     this.name = name;
     this.started = false;
     console.log("WSServer: Created new game '"+name+"'");
+    //Waiting Game
+    this.emit("gamestatus", {error: false, value: 0, time: 0});
 }
 Game.prototype.events = new EventMap();
 
@@ -194,6 +224,9 @@ Game.prototype.start = function(){
 Game.prototype.waitRound = function(){
     var self = this;
     this.started = false;
+    //Starting Game
+    this.emit("gamestatus", {error: false, value: 1, time: Config.Game.waitTime});
+
     this.events.createEvent(function(){
         self.startRound();
     }, Config.Game.waitTime);
@@ -201,6 +234,8 @@ Game.prototype.waitRound = function(){
 Game.prototype.startRound = function(){
     var self = this;
     this.started = true;
+    //Started Game
+    this.emit("gamestatus", {error: false, value: 2, time: 0});
 
     this.players.forEach(function(player){
         var x = Math.randomRange(0, Config.Map.width);
@@ -297,6 +332,11 @@ Game.prototype.emit = function(opcode, data){
         player.socket.emit(opcode, data);
     });
 }
+
+
+
+
+
 
 //*******************************
 // Component class
