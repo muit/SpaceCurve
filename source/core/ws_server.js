@@ -171,7 +171,6 @@ WsServer.prototype.createGame = function(player, data){
 }
 
 WsServer.prototype.exitGame = function(player, data){
-    console.log("hey!");
     if(player.inGame){
         player.socket.emit("exitgame", {error: true, msg: "You are not in a game."});
         return;
@@ -189,12 +188,15 @@ WsServer.prototype.startGame = function(player, data){
         return;
     }
     var game = player.game;
-    if(game.moderator == player){
+    
+    if(game.moderator != player)
+        var data = {error: true, msg: "You are not the game moderator."};
+    else if(game.started)
+        var data = {error:true, msg: "The game has already started."};
+    else{
         game.start();
-        var data = {error: false, msg: "Starting game."}
+        var data = {error: false, msg: "Starting game."};
     }
-    else
-        var data = {error: true, msg: "You are not the game moderator."}
 
     player.socket.emit("startgame", data);
 }
@@ -224,7 +226,7 @@ Game.prototype.start = function(){
 }
 Game.prototype.waitRound = function(){
     var self = this;
-    this.started = false;
+    this.started = true;
     //Starting Game
     this.emit("gamestatus", {error: false, value: 1, time: Config.Game.waitTime});
 
@@ -244,6 +246,8 @@ Game.prototype.startRound = function(){
         player.position = new Vector2(x, y);
     });
 
+    //Benchmarked: inviable, as i supposed.
+    //Must send data only when player interact
     new Timer(function(){
         self.update();
         return !self.started;
