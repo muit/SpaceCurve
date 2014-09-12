@@ -232,7 +232,7 @@ Game.prototype.waitRound = function(){
     this.emit("gamestatus", {error: false, value: 1, time: Config.Game.waitTime});
     this.waiting = true;
     this.events.createEvent(function(){
-        this.waiting = false;
+        self.waiting = false;
         self.startRound();
     }, Config.Game.waitTime);
 }
@@ -250,6 +250,9 @@ Game.prototype.startRound = function(){
 
     //Benchmarked: bucle inviable, as i supposed.
     //Must send data only when player interact
+    new Timer(function(){
+        self.update();
+    }, 40);
 }
 Game.prototype.endRound = function(){
     this.started = false;
@@ -260,7 +263,6 @@ Game.prototype.endRound = function(){
 // Periodic Update
 //*******************************
 Game.prototype.update = function(){
-    this.sendData();
 }
 Game.prototype.sendData = function(){
     if(this.players.length > 0){
@@ -272,12 +274,12 @@ Game.prototype.sendData = function(){
                 position: {
                     x: player.position.x, 
                     y: player.position.y,
-                    y: player.position.z,
+                    z: player.position.z,
                 },
                 rotation: {
                     x: player.rotation.x, 
                     y: player.rotation.y,
-                    y: player.rotation.z,
+                    z: player.rotation.z,
                 },
                 alive: player.alive,
                 score: player.score
@@ -291,7 +293,7 @@ Game.prototype.sendData = function(){
                 position: {
                     x: object.position.x, 
                     y: object.position.y,
-                    y: object.position.z
+                    z: object.position.z
                 },
             });
         });
@@ -381,7 +383,6 @@ Component.prototype.setRotation = function(x, y, z){
 // Player class
 //*******************************
 var Player = function(name, socket, x, y, z, game){
-    if(!rad) rad = 0;
 
     Component.call(this, x, y, z, game);
 
