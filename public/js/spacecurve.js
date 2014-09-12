@@ -147,16 +147,15 @@ Game.prototype.objects = [];
 Game.prototype.entities = [];
 
 Game.prototype.bucle = function(){
-    this.update();
-    this.render();
+    var self = this;
+    new Timer(function(diff){
+        self.update();
+        self.render();
+        self.stats.update();
+        self.renderstats.update(self.renderer);
 
-    this.stats.update();
-    this.renderstats.update(this.renderer);
-    if(!this.done){
-        //Need a benchmark (Utyl Timer vs. Three.js frames)
-        var self = this;
-        requestAnimationFrame(function(){self.bucle();});
-    }
+        return self.done;
+    }, 60);
 }
 Game.prototype.render = function(){
     this.renderer.render(this.scene, this.camera); 
@@ -338,6 +337,17 @@ Network = function(port){
     this.socket.on('connect_error', function(err) {
         self.logged = false;
         SC.log("Couldn't connect to server. Retrying...");
+    });
+
+    this.socket.on('disconnect', function(){
+        self.logged = false;
+
+        if(__.Url.current() != undefined){
+            __.Url.current().aside("login");
+            errorElem = document.querySelector("#login > [data-atom-button], #error");
+            errorElem.innerHTML = "Disconnected from server.";
+            errorElem.style.display = "block";
+        }
     });
 }
 Network.prototype.isConnected = function(){return network.socket.connected}
