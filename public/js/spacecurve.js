@@ -91,11 +91,12 @@ Game.prototype.loadEvents = function(){
             break;
 
             case 1:
-            //Start visual timer with time: data.time
+            __.Dialog.Counter.setTime(5000);
             break;
 
             case 2:
             self.start();
+            __.Dialog.Counter.hide();
             break; 
         }
     });
@@ -149,11 +150,11 @@ Game.prototype.entities = [];
 Game.prototype.bucle = function(){
     var self = this;
     new Timer(function(diff){
-        self.update();
+        self.update(diff);
         self.render();
         self.stats.update();
         self.renderstats.update(self.renderer);
-
+        
         return self.done;
     }, 60);
 }
@@ -161,10 +162,10 @@ Game.prototype.render = function(){
     this.renderer.render(this.scene, this.camera); 
 }
 
-Game.prototype.update = function(){
-    this.cube.rotation.x += 0.03;
-    this.cube.rotation.y += 0.03;
-    this.cube.rotation.z += 0.03;
+Game.prototype.update = function(diff){
+    this.cube.rotation.x += 0.03*diff;
+    this.cube.rotation.y += 0.03*diff;
+    this.cube.rotation.z += 0.03*diff;
 }
 
 Game.prototype.add = function(element){
