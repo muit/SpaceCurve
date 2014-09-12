@@ -39,6 +39,7 @@ children:
         - Molecule.List:
             children: []
             id: gamelist
+            style: padding
             events:
               - select
             callbacks:

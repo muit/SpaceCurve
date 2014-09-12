@@ -38,6 +38,6 @@ class Atoms.Organism.Game_list extends Atoms.Organism.Article
 
   onCreateGame: (atom, dispatcher, hierarchy...) ->
     id = __.Entity.GameItem.count()
-    __.Article.Game.create __.Entity.GameItem.create({id: id, name: "Name!", players: "0/6", status: "Waiting"})
+    __.Article.Game.create {id: id, name: "Name!", players: "0/6", status: "Waiting"}
 
 new Atoms.Organism.Game_list()
