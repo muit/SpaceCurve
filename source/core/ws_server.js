@@ -112,6 +112,7 @@ WsServer.prototype.removeGame = function(game){
 //*******************************
 WsServer.prototype.setDirection = function(player, direction){
     player.direction = direction;
+    player.game.sendData();
 }
 
 WsServer.prototype.disconect = function(player, data){
@@ -191,7 +192,7 @@ WsServer.prototype.startGame = function(player, data){
     
     if(game.moderator != player)
         var data = {error: true, msg: "You are not the game moderator."};
-    else if(game.started)
+    else if(game.started || game.waiting)
         var data = {error:true, msg: "The game has already started."};
     else{
         game.start();
@@ -226,11 +227,12 @@ Game.prototype.start = function(){
 }
 Game.prototype.waitRound = function(){
     var self = this;
-    this.started = true;
+    this.started = false;
     //Starting Game
     this.emit("gamestatus", {error: false, value: 1, time: Config.Game.waitTime});
-
+    this.waiting = true;
     this.events.createEvent(function(){
+        this.waiting = false;
         self.startRound();
     }, Config.Game.waitTime);
 }
@@ -243,15 +245,11 @@ Game.prototype.startRound = function(){
     this.players.forEach(function(player){
         var x = Math.randomRange(0, Config.Map.width);
         var y = Math.randomRange(0, Config.Map.height);
-        player.position = new Vector2(x, y);
+        player.position = new Vector3(x, y, 0);
     });
 
-    //Benchmarked: inviable, as i supposed.
+    //Benchmarked: bucle inviable, as i supposed.
     //Must send data only when player interact
-    new Timer(function(){
-        self.update();
-        return !self.started;
-    }, 25);//40fps
 }
 Game.prototype.endRound = function(){
     this.started = false;
@@ -271,8 +269,16 @@ Game.prototype.sendData = function(){
             player.update();
             playerData.push({
                 name: player.name, 
-                x: player.position.x, 
-                y: player.position.y,
+                position: {
+                    x: player.position.x, 
+                    y: player.position.y,
+                    y: player.position.z,
+                },
+                rotation: {
+                    x: player.rotation.x, 
+                    y: player.rotation.y,
+                    y: player.rotation.z,
+                },
                 alive: player.alive,
                 score: player.score
             });
@@ -281,9 +287,12 @@ Game.prototype.sendData = function(){
         var objectData = [];
         this.objects.forEach(function(object) {
             objectData.push({
-                type: object.constructor.name, 
-                x: object.position.x, 
-                y: object.position.y
+                type: object.constructor.name,
+                position: {
+                    x: object.position.x, 
+                    y: object.position.y,
+                    y: object.position.z
+                },
             });
         });
 
@@ -319,7 +328,7 @@ Game.prototype.kickPlayer = function(player){
     this.players.remove(player);
 
     if(this.players.length <= 0){
-        console.log("Not enought players. Game "+this.name+" will be closed.");
+        console.log("Not enought players. Game "+this.name+" will close.");
         websocketServer.removeGame(this);
     }
     else if(this.moderator == player){
@@ -352,34 +361,37 @@ Game.prototype.emit = function(opcode, data){
 // Component class
 // Father of everything
 //*******************************
-var Component = function(x, y, game){
-    if(x == undefined || y == undefined)
+var Component = function(x, y, z, game){
+    if(x == undefined || y == undefined || z == undefined)
         throw new Error("Component: Cant create without valid coordinates.");
 
-    this.position = new Vector2(x,y);
+    this.position = new Vector3(x,y,z);
     this.game = game;
 }
-Component.prototype.position = new Vector2(0,0);
-Component.prototype.setPosition = function(x, y){
-    this.position = new Vector2(x, y);
+Component.prototype.position = new Vector3(0,0,0);
+Component.prototype.setPosition = function(x, y, z){
+    this.position = new Vector3(x, y, z);
+}
+Component.prototype.rotation = new Vector3(0,0,0);
+Component.prototype.setRotation = function(x, y, z){
+    this.rotation = new Vector3(x, y, z);
 }
 
 //*******************************
 // Player class
 //*******************************
-var Player = function(name, socket, x, y, rad, game){
+var Player = function(name, socket, x, y, z, game){
     if(!rad) rad = 0;
 
-    Component.call(this, x, y, game);
+    Component.call(this, x, y, z, game);
 
     this.inGame = false;
     this.name = name;
     this.alive = true;
     this.score = 0;
     this.socket = socket;
-    this.direction = rad;
 }
-Player.inherits(new Component(0,0));
+Player.inherits(new Component(0,0,0));
 
 Player.prototype.isModerator = function(){
     if(this.game == undefined)
@@ -388,7 +400,7 @@ Player.prototype.isModerator = function(){
 }
 
 Player.prototype.update = function(){
-    var alpha = this.direction;
+    var alpha = this.rotation.x;
     this.position.x += this.speed * Math.cos(alpha);
     this.position.y += this.speed * Math.sin(alpha);
 }
@@ -398,8 +410,8 @@ Player.prototype.radius = Config.Player.radius;
 //*******************************
 // Object Class
 //*******************************
-var Object = function(x, y, game){ Component.call(this, x, y, game); }
-Object.inherits(new Component(0,0));
+var Object = function(x, y, z, game){ Component.call(this, x, y, z, game); }
+Object.inherits(new Component(0,0,0));
 
 Object.prototype.events = new EventMap();
 Object.prototype.active = new Trigger();
@@ -426,8 +438,8 @@ Object.prototype.after_activate = function(player){}
 //----------
 // Bird
 //----------
-Object.Bird = function(x, y, game){ Object.call(this, x, y, game); }
-Object.Bird.inherits(new Object(0, 0));
+Object.Bird = function(x, y, z, game){ Object.call(this, x, y, z, game); }
+Object.Bird.inherits(new Object(0, 0, 0));
 Object.Bird.name = "Bird";
 
 Object.Bird.prototype.before_activate = function(player){
@@ -440,8 +452,8 @@ Object.Bird.prototype.after_activate = function(player){
 //----------
 // Turtle
 //----------
-Object.Turtle = function(x, y, game){ Object.call(this, x, y, game); }
-Object.Turtle.inherits(new Object(0, 0));
+Object.Turtle = function(x, y, z, game){ Object.call(this, x, y, z, game); }
+Object.Turtle.inherits(new Object(0, 0, 0));
 Object.Turtle.name = "Turtle";
 
 Object.Turtle.prototype.before_activate = function(player){
@@ -454,8 +466,8 @@ Object.Turtle.prototype.after_activate = function(player){
 //----------
 // CrossWall
 //----------
-Object.CrossWall = function(x, y, game){ Object.call(this, x, y, game); }
-Object.CrossWall.inherits(new Object(0, 0));
+Object.CrossWall = function(x, y, z, game){ Object.call(this, x, y, z, game); }
+Object.CrossWall.inherits(new Object(0, 0, 0));
 Object.CrossWall.name = "CrossWall";
 
 Object.CrossWall.prototype.before_activate = function(player){}
@@ -464,8 +476,8 @@ Object.CrossWall.prototype.after_activate = function(player){}
 //----------
 // CrossLine
 //----------
-Object.CrossLine = function(x, y, game){ Object.call(this, x, y, game); }
-Object.CrossLine.inherits(new Object(0, 0));
+Object.CrossLine = function(x, y, z, game){ Object.call(this, x, y, z, game); }
+Object.CrossLine.inherits(new Object(0, 0, 0));
 Object.CrossLine.name = "CrossLine";
 
 Object.CrossLine.prototype.before_activate = function(player){}
@@ -474,8 +486,8 @@ Object.CrossLine.prototype.after_activate = function(player){}
 //----------
 // Immunity
 //----------
-Object.Immunity = function(x, y, game){ Object.call(this, x, y, game); }
-Object.Immunity.inherits(new Object(0, 0));
+Object.Immunity = function(x, y, z, game){ Object.call(this, x, y, z, game); }
+Object.Immunity.inherits(new Object(0, 0, 0));
 Object.Immunity.name = "Immunity";
 
 Object.Immunity.prototype.before_activate = function(player){}

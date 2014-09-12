@@ -184,17 +184,21 @@ Game.prototype.add = function(element){
 // Component Class
 // Father of everything
 //************************
-Game.Component = function(x, y){
-    if(x == undefined || y == undefined)
+Game.Component = function(x, y, z){
+    if(x == undefined || y == undefined || z == undefined)
         throw new Error("Component: Cant create without valid coordinates.");
 
-    this.position = new Vector2(x,y);
+    this.position = new Vector3(x, y, z);
 }
-Game.Component.prototype.position = new Vector2(0,0);
-Game.Component.prototype.setPosition = function(x, y){
-    this.position = new Vector2(x, y);
+Game.Component.prototype.position = new Vector3(0,0,0);
+Game.Component.prototype.setPosition = function(x, y, z){
+    this.position = new Vector3(x, y, z);
 }
 
+Game.Component.prototype.rotation = new Vector3(0,0,0);
+Game.Component.prototype.setRotation = function(x, y, z){
+    this.rotation = new Vector3(x, y, z);
+}
 
 //*************************************************************************
 // Entity Class
@@ -202,7 +206,7 @@ Game.Component.prototype.setPosition = function(x, y){
 Game.Entity = function(color){
     this.setColor(color);
 }
-Game.Entity.inherits(new Game.Component(0,0));
+Game.Entity.inherits(new Game.Component(0,0,0));
 
 Game.Entity.prototype.setColor = function(color){
     if(color == "random")
@@ -228,7 +232,7 @@ Game.Player.inherits(Game.Entity);
 // Object Class
 //************************
 Game.Object = function(){}
-Game.Object.inherits(new Game.Component(0,0));
+Game.Object.inherits(new Game.Component(0,0,0));
 Game.Object.icon = "img/object.png";
 //************************
 //Object Types
