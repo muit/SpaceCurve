@@ -10,7 +10,7 @@ SC = {
         if (typeof moduleName == "string") {
             moduleName = String(moduleName).toLowerCase();
             if (moduleName in this.modules) {
-                return this.modules[moduleName];                
+                return this.modules[moduleName];
             }
             throw new Error("SGF.require: module name '" + moduleName + "' does not exist");
         }
@@ -20,7 +20,7 @@ SC = {
         console.log(text);
     },
     modules: {},
-}
+};
 
 
 
@@ -36,10 +36,9 @@ SC = {
  * @constructor
  **/
 function Game(options){
-    if(options == undefined){
+    if(options === undefined){
         options.debug = false;
     }
-
     this.renderer = new THREE.WebGLRenderer();
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
@@ -58,26 +57,32 @@ function Game(options){
 
     var self = this;
     window.onresize = function(){
-        self.reload(options);
-    }
-};
-Game.prototype.reload = function(options){
+        self.screen.reload(options);
+    };
+}
+Game.prototype.screen = {};
+Game.prototype.screen.reload = function(options){
     var canvas = document.getElementById("canvas");
     if(!canvas)
         throw new Error("Canvas element does not exist.");
 
     canvas.innerHTML = "";
+    var side = 0;
     if(canvas.clientHeight < canvas.clientWidth)
-        var side = canvas.clientHeight;
+        side = canvas.clientHeight;
     else
-        var side = canvas.clientWidth;
+        side = canvas.clientWidth;
 
-    this.renderer.setClearColor(0x777777);
-    this.renderer.setSize(side, side);
+    this.height = side;
+    this.width = side;
+
+    this.this.renderer.setClearColor(0x777777);
+    this.this.renderer.setSize(side, side);
 
     canvas.appendChild(this.renderer.domElement);
     this.loadStats(options);
-}
+};
+
 Game.prototype.loadEvents = function(){
     var self = this;
     network.onGameStatus(function(data){
@@ -97,16 +102,16 @@ Game.prototype.loadEvents = function(){
             case 2:
             self.start();
             __.Dialog.Counter.hide();
-            break; 
+            break;
         }
     });
-}
+};
 Game.prototype.loadStats = function(options){
     var canvas = document.getElementById("canvas");
     if(!canvas)
         throw new Error("Canvas element does not exist.");
 
-    if(options.debug == true){
+    if(options.debug === true){
         //Render stats
         this.renderstats = new THREEx.RendererStats();
         this.renderstats.domElement.style.position = 'absolute';
@@ -124,10 +129,14 @@ Game.prototype.loadStats = function(options){
     }
     else{
         //Fake stats adapters
-        this.stats = {update: function(){}};
-        this.renderstats = {update: function(r){}}
+        this.stats = {
+            update: function(){}
+        };
+        this.renderstats = {
+            update: function(r){}
+        };
     }
-}
+};
 Game.prototype.start = function(){
     this.done = false;
 
@@ -139,10 +148,10 @@ Game.prototype.start = function(){
     });
 
     this.bucle();
-}
+};
 Game.prototype.pause = function(){
     this.done = true;
-}
+};
 
 Game.prototype.objects = [];
 Game.prototype.entities = [];
@@ -154,25 +163,25 @@ Game.prototype.bucle = function(){
         self.render();
         self.stats.update();
         self.renderstats.update(self.renderer);
-        
+
         return self.done;
     }, 60);
-}
+};
 Game.prototype.render = function(){
-    this.renderer.render(this.scene, this.camera); 
-}
+    this.renderer.render(this.scene, this.camera);
+};
 
 Game.prototype.update = function(diff){
     this.cube.rotation.x += 0.03*diff;
     this.cube.rotation.y += 0.03*diff;
     this.cube.rotation.z += 0.03*diff;
-}
+};
 
 Game.prototype.add = function(element){
-    if(!element.gl) 
+    if(!element.gl)
         throw new Error("Element don't have gl module.");
     this.scenene.add(element.glMesh);
-}
+};
 
 
 
@@ -185,27 +194,27 @@ Game.prototype.add = function(element){
 // Father of everything
 //************************
 Game.Component = function(x, y, z){
-    if(x == undefined || y == undefined || z == undefined)
+    if(x === undefined || y === undefined || z === undefined)
         throw new Error("Component: Cant create without valid coordinates.");
 
     this.position = new Vector3(x, y, z);
-}
+};
 Game.Component.prototype.position = new Vector3(0,0,0);
 Game.Component.prototype.setPosition = function(x, y, z){
     this.position = new Vector3(x, y, z);
-}
+};
 
 Game.Component.prototype.rotation = new Vector3(0,0,0);
 Game.Component.prototype.setRotation = function(x, y, z){
     this.rotation = new Vector3(x, y, z);
-}
+};
 
 //*************************************************************************
 // Entity Class
 //************************
 Game.Entity = function(color){
     this.setColor(color);
-}
+};
 Game.Entity.inherits(new Game.Component(0,0,0));
 
 Game.Entity.prototype.setColor = function(color){
@@ -213,51 +222,51 @@ Game.Entity.prototype.setColor = function(color){
         this.color = new RGB(Math.randomRange(0,255),Math.randomRange(0,255),Math.randomRange(0,255));
     else if(color instanceof RGB || color instanceof RGBA)
         this.color = color;
-}
+};
 
 //************************
 // IA Class
 //************************
-Game.IAEntity = function(){ Entity.call(this, "random"); }
+Game.IAEntity = function(){ Entity.call(this, "random"); };
 Game.IAEntity.inherits(Game.Entity);
 
 //************************
 // Player Class
 //************************
-Game.Player = function(){ Entity.call(this, "random"); }
+Game.Player = function(){ Entity.call(this, "random"); };
 Game.Player.inherits(Game.Entity);
 
 
 //*************************************************************************
 // Object Class
 //************************
-Game.Object = function(){}
+Game.Object = function(){};
 Game.Object.inherits(new Game.Component(0,0,0));
 Game.Object.icon = "img/object.png";
 //************************
 //Object Types
 //************************
-Game.Object.Bird = function(){}
+Game.Object.Bird = function(){};
 Game.Object.Bird.inherits(Game.Object);
 Game.Object.Bird.icon = "img/object_bird.png";
 
-Game.Object.Turtle = function(){}
+Game.Object.Turtle = function(){};
 Game.Object.Turtle.inherits(Game.Object);
 Game.Object.Turtle.icon = "img/object_turtle.png";
 
-Game.Object.CrossWall = function(){}
+Game.Object.CrossWall = function(){};
 Game.Object.CrossWall.inherits(Game.Object);
 Game.Object.CrossWall.icon = "img/object_crosswall.png";
 
-Game.Object.CrossLine = function(){}
+Game.Object.CrossLine = function(){};
 Game.Object.CrossLine.inherits(Game.Object);
 Game.Object.CrossLine.icon = "img/object_crossline.png";
 
-Game.Object.Immunity = function(){}
+Game.Object.Immunity = function(){};
 Game.Object.Immunity.inherits(Game.Object);
 Game.Object.Immunity.icon = "img/object_immunity.png";
 
-SC.modules["game"] = Game;
+SC.modules.game = Game;
 
 
 
@@ -268,14 +277,16 @@ SC.modules["game"] = Game;
 
 /** section: Input API
  * Input Class
- * 
+ *
  * Reads all the player inputs to control the game.
  * @constructor
  **/
-
 Input = function(game){
+    this.game = game;
+    this.createElement("generic");
+};
 
-}
+/** ASCII Constants **/
 Input.MOUSE_PRIMARY  = 0;
 Input.MOUSE_MIDDLE   = 1;
 Input.MOUSE_SECONDARY= 2;
@@ -288,34 +299,61 @@ Input.KEY_2          = 33;
 Input.KEY_3          = 34;
 Input.KEY_4          = 35;
 
-Input.grab = function() {
-    document['observe']("keydown", keydownHandler)
-            ['observe']("keypress", keypressHandler)
-            ['observe']("keyup", keyupHandler)
-            ['observe']("mousemove", mousemoveHandler)
-            ['observe']("mousedown", mousedownHandler)
-            ['observe']("mouseup", mouseupHandler)
-            ['observe']("touchstart", touchstartHandler)
-            ['observe']("touchmove", touchmoveHandler)
-            ['observe']("touchend", touchendHandler)
-            ['observe']("contextmenu", contextmenuHandler);
-    Input.grabbed = true;
-}
+Input.events = {
+    "grab": grabHandler,
+};
 
-Input.release = function() {
-    document['stopObserving']("keydown", keydownHandler)
-            ['stopObserving']("keypress", keypressHandler)
-            ['stopObserving']("keyup", keyupHandler)
-            ['stopObserving']("mousemove", mousemoveHandler)
-            ['stopObserving']("mousedown", mousedownHandler)
-            ['stopObserving']("mouseup", mouseupHandler)
-            ['stopObserving']("touchstart", touchstartHandler)
-            ['stopObserving']("touchmove", touchmoveHandler)
-            ['stopObserving']("touchend", touchendHandler)
-            ['stopObserving']("contextmenu", contextmenuHandler);
-    Input.grabbed = false;
-}
-SC.modules["input"] = Input;
+Input.prototype.renderTouchPad = function(){
+    document.querySelector("body").html("<section id='touchpad' style='position:fixed; height:100%; width:100%; overflow:hidden;'></section>");
+};
+
+/** Cursor Position **/
+Input.prototype.pointer = new Vector2(0,0);
+
+Input.prototype.getPointerCoords = function() {
+    var xOffset = game.screen.width,
+        yOffset = game.screen.height;
+    return new Vector2(this.pointer.x - xOffset, this.pointer.y - yOffset);
+};
+
+/** Elements **/
+Input.prototype.elements = [];
+Input.prototype.createElement = function(selector){
+    if(selector == "generic")
+        return (this.generic = new Element(selector));
+    return this.elements.push(new Element(selector));
+};
+
+
+
+/** Element Class
+ * @constructor
+ * Input instances for diferent element inputs
+**/
+Element = function(selector){
+    if(selector != "generic") {
+        this.el = document.querySelector(selector);
+        if(!this.el) throw new Error("Input#Element: Couldn't get element by id.");
+        this.quo = $$(selector);
+    } else {
+        this.el = document;
+        this.quo = $$("html");
+    }
+};
+Element.prototype.on = function(event, callback){
+
+};
+
+Element.prototype.off = function(event){
+    //Stop listening mouse or key
+
+    //Stop listening touch
+    this.quo.off(/*...*/);
+};
+
+Input.Element = Element;
+
+SC.modules.input = Input;
 
 
 
@@ -343,18 +381,19 @@ Network = function(port){
     this.socket.on('disconnect', function(){
         self.logged = false;
 
-        if(__.Url.current() != undefined){
+        if(__.Url.current() !== undefined){
             __.Url.current().aside("login");
             errorElem = document.querySelector("#login > [data-atom-button], #error");
             errorElem.innerHTML = "Disconnected from server.";
             errorElem.style.display = "block";
         }
     });
-}
-Network.prototype.isConnected = function(){return network.socket.connected}
+};
+
+Network.prototype.isConnected = function(){return network.socket.connected;};
 Network.prototype.login = function(name, password, success, error){
     if(!this.isConnected()){
-        if(error!=undefined) error("Not connected to server.");
+        if(error !== undefined) error("Not connected to server.");
         return;
     }
     if(!this.logged){
@@ -363,23 +402,24 @@ Network.prototype.login = function(name, password, success, error){
             self.socket.removeAllListeners("login");
             if(!res.error){
                 self.logged = true;
-                if(success != undefined) success(res.msg);
+                if(success !== undefined) success(res.msg);
             }
             else {
-                self.logged = false; 
-                if(error != undefined) error(res.msg);
+                self.logged = false;
+                if(error !== undefined) error(res.msg);
             }
         });
         this.socket.emit("login", name, password);
     }
-}
+};
+
 Network.prototype.signup = function(name, email, password, success, error){
     if(!this.isConnected()){
-        if(error!=undefined) error("Not connected to server.");
+        if(error !== undefined) error("Not connected to server.");
         return;
     }
     //Not yet
-}
+};
 
 Network.prototype.logout = function(){
     if(!this.isConnected()){
@@ -389,7 +429,7 @@ Network.prototype.logout = function(){
         this.socket.emit("logout", {});
         this.logged = false;
     }
-}
+};
 
 Network.prototype.onInfo = function(players, objects){
     this.socket.removeAllListeners("info");
@@ -397,7 +437,7 @@ Network.prototype.onInfo = function(players, objects){
         players(data.players);
         objects(data.objects);
     });
-}
+};
 
 Network.prototype.getGames = function(games){
     if(!this.isConnected()){
@@ -410,10 +450,10 @@ Network.prototype.getGames = function(games){
         self.socket.removeAllListeners("games");
 
         SC.log("Games received from server");
-        if(data.error == undefined) data.error = true;
+        if(data.error === undefined) data.error = true;
         games(data);
     });
-}
+};
 
 Network.prototype.joinGame = function(id, callback){
     if(!this.isConnected()){
@@ -425,11 +465,11 @@ Network.prototype.joinGame = function(id, callback){
         self.socket.removeAllListeners("joingame");
 
         SC.log(data.msg);
-        if(data.error == undefined) data.error = true;
+        if(data.error === undefined) data.error = true;
         callback(data);
     });
     this.socket.emit("joingame", {id: id});
-}
+};
 
 Network.prototype.createGame = function(name, callback){
     if(!this.isConnected()){
@@ -441,11 +481,11 @@ Network.prototype.createGame = function(name, callback){
         self.socket.removeAllListeners("creategame");
 
         SC.log(data.msg);
-        if(data.error == undefined) data.error = true;
+        if(data.error === undefined) data.error = true;
         callback(data);
     });
     this.socket.emit("creategame", {name: name});
-}
+};
 
 Network.prototype.exitGame = function(callback){
     if(!this.isConnected()){
@@ -457,21 +497,21 @@ Network.prototype.exitGame = function(callback){
         self.socket.removeAllListeners("exitgame");
 
         SC.log(data.msg);
-        if(data.error == undefined) data.error = true;
+        if(data.error === undefined) data.error = true;
         callback(data);
     });
     this.socket.emit("exitgame", {});
-}
+};
 
 Network.prototype.onGameStatus = function(callback){
     var self = this;
     self.socket.removeAllListeners("gamestatus");
     self.socket.on("gamestatus", function(data){
         SC.log("Game State: "+data.value);
-        if(data.error == undefined) data.error = true;
+        if(data.error === undefined) data.error = true;
         callback(data);
     });
-}
+};
 
 Network.prototype.startGame = function(callback){
     if(!this.isConnected()){
@@ -487,6 +527,6 @@ Network.prototype.startGame = function(callback){
         //callback(data);
     });
     this.socket.emit("startgame", {});
-}
+};
 
-SC.modules["network"] = Network;
+SC.modules.network = Network;
