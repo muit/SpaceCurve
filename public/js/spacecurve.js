@@ -299,12 +299,8 @@ Input.KEY_2          = 33;
 Input.KEY_3          = 34;
 Input.KEY_4          = 35;
 
-Input.events = {
-    "grab": grabHandler,
-};
-
 Input.prototype.renderTouchPad = function(){
-    document.querySelector("body").html("<section id='touchpad' style='position:fixed; height:100%; width:100%; overflow:hidden;'></section>");
+    document.querySelector("body").html("<section id='touchpad' style='z-index: -1; position:fixed; height:100%; width:100%; overflow:hidden;'></section>");
 };
 
 /** Cursor Position **/
@@ -339,12 +335,54 @@ Element = function(selector){
         this.el = document;
         this.quo = $$("html");
     }
+
+    this.listenKeys();
 };
-Element.prototype.on = function(event, callback){
+Element.prototype.keyEvents = {
+    keydown: [],
+    keyup: [],
+};
+
+Element.prototype.listenKeys = function(){
+    var self = this;
+
+    var onKeyEvent = function(ev){
+        var key = ev.keyCode;
+
+        var listeners = self.keyEvents[ev.type];
+        if(listeners[key] !== undefined)
+            listeners[key]();
+    };
+    for(var eventName in this.keyEvents){
+        this.el.addEventListener(eventName, onKeyEvent);
+    }
+};
+
+Element.prototype.listenTouchAndMouse = function(){
+};
+
+Element.prototype.onKey = function(eventName, callback, key){
+    if(typeof key !== "number")
+        throw new Error("SC.Input#Element: Need a number!");
+
+    var listeners = this.keyEvents[eventName];
+    if(listeners)
+        listeners[key] = callback;
+};
+
+Element.prototype.offKey = function(eventName, key){
+    if(typeof key !== "number")
+        throw new Error("SC.Input#Element: Need a number!");
+
+    var listeners = this.keyEvents[eventName];
+    if(listeners) listeners[key] = undefined;
+};
+
+Element.prototype.onTouch = function(event, callback){
 
 };
 
-Element.prototype.off = function(event){
+Element.prototype.offTouch = function(event){
     //Stop listening mouse or key
 
     //Stop listening touch
