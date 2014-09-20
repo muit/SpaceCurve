@@ -57,11 +57,10 @@ function Game(options){
 
     var self = this;
     window.onresize = function(){
-        self.screen.reload(options);
+        self.reload(options);
     };
 }
-Game.prototype.screen = {};
-Game.prototype.screen.reload = function(options){
+Game.prototype.reload = function(options){
     var canvas = document.getElementById("canvas");
     if(!canvas)
         throw new Error("Canvas element does not exist.");
@@ -307,8 +306,8 @@ Input.prototype.renderTouchPad = function(){
 Input.prototype.pointer = new Vector2(0,0);
 
 Input.prototype.getPointerCoords = function() {
-    var xOffset = game.screen.width,
-        yOffset = game.screen.height;
+    var xOffset = game.width,
+        yOffset = game.height;
     return new Vector2(this.pointer.x - xOffset, this.pointer.y - yOffset);
 };
 
