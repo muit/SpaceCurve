@@ -79,7 +79,7 @@ gulp.task('yml', function() {
 });
 
 gulp.task('webserver', function() {
-  connect.server({ port: 3000, root: 'public/', livereload: true });
+  require("./bin/server");
 });
 
 gulp.task('init', function() {

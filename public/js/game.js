@@ -1,3 +1,6 @@
+
+SC.modules.game = Game;
+
 /** section: Game API
  * class Component
  *
@@ -200,5 +203,3 @@ Game.Object.CrossLine.icon = "img/object_crossline.png";
 Game.Object.Immunity = function(){};
 Game.Object.Immunity.inherits(Game.Object);
 Game.Object.Immunity.icon = "img/object_immunity.png";
-
-SC.modules.game = Game;

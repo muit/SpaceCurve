@@ -1,5 +1,5 @@
 if(typeof Utyl == "undefined") require("../source/utyl/utyl.js");
-require("../source/core/config.js");
+config = require("../source/core/config.js");
 http = require("../source/core/http_server.js");
 ws = require("../source/core/ws_server.js");
 

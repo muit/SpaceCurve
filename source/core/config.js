@@ -5,7 +5,7 @@ ifNotDefined("WsServer.Object.CrossWall");
 ifNotDefined("WsServer.Object.CrossLine");
 ifNotDefined("WsServer.Object.Immunity");
 
-Config = {
+module.exports = exports = Config = {
     Info: {
         version: "0.0.1",
         stable: false,
@@ -45,10 +45,18 @@ Config = {
     },
 
     //--------
-    //System
+    //Server
     //--------
     Server: {
-        cluster: false,
-        clusterSize: 4, // number/"auto"
+        debug: true,
+        directory: "./public",
+
+        cluster: {
+            // Enabling cluster
+            enabled: true,
+
+            // Amount of cpus that will be used. By default is "max".
+            cpus: "max"
+        }
     }
 }
