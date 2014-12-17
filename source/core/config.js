@@ -48,15 +48,15 @@ module.exports = exports = Config = {
     //Server
     //--------
     Server: {
-        debug: true,
+        home: "index.html",
         directory: "./public",
-
+        debug: true,
+        secure: false,
         cluster: {
             // Enabling cluster
             enabled: true,
-
             // Amount of cpus that will be used. By default is "max".
             cpus: "max"
         }
     }
-}
+};
